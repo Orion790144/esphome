@@ -1,12 +1,9 @@
+import esphome.codegen as cg
 from esphome.components import switch
 import esphome.config_validation as cv
-import esphome.codegen as cg
+from esphome.const import ENTITY_CATEGORY_CONFIG
 
-from esphome.const import (
-    ENTITY_CATEGORY_CONFIG,
-)
-
-from .. import dxs238xw_ns, CONF_DXS238XW_ID, SmIdEntity, DXS238XW_COMPONENT_SCHEMA
+from .. import CONF_DXS238XW_ID, DXS238XW_COMPONENT_SCHEMA, SmIdEntity, dxs238xw_ns
 
 DEPENDENCIES = ["dxs238xw"]
 

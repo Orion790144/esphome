@@ -1,11 +1,12 @@
 import logging
-import esphome.codegen as cg
-import esphome.config_validation as cv
-import esphome.final_validate as fv
+
 from esphome import automation
 from esphome.automation import maybe_simple_id
+import esphome.codegen as cg
 from esphome.components import uart
-from esphome.const import CONF_ID, CONF_RX_PIN, CONF_TX_PIN, CONF_BAUD_RATE, CONF_NUMBER
+import esphome.config_validation as cv
+from esphome.const import CONF_BAUD_RATE, CONF_ID, CONF_NUMBER, CONF_RX_PIN, CONF_TX_PIN
+import esphome.final_validate as fv
 
 _LOGGER = logging.getLogger(__name__)
 

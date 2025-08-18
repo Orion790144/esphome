@@ -1,27 +1,22 @@
-from esphome.components import number
-import esphome.config_validation as cv
 import esphome.codegen as cg
-
+from esphome.components import number
 from esphome.components.number import NUMBER_MODES
-
+import esphome.config_validation as cv
 from esphome.const import (
-    CONF_ICON,
-    CONF_ENTITY_CATEGORY,
     CONF_MODE,
     ENTITY_CATEGORY_CONFIG,
-    CONF_UNIT_OF_MEASUREMENT,
     UNIT_AMPERE,
-    UNIT_VOLT,
     UNIT_KILOWATT_HOURS,
     UNIT_MINUTE,
+    UNIT_VOLT,
 )
 
 from .. import (
-    dxs238xw_ns,
     CONF_DXS238XW_ID,
+    DXS238XW_COMPONENT_SCHEMA,
     SmIdEntity,
     SmLimitValue,
-    DXS238XW_COMPONENT_SCHEMA,
+    dxs238xw_ns,
 )
 
 DEPENDENCIES = ["dxs238xw"]
@@ -41,17 +36,16 @@ UNIT_CURRENCY_DOLLAR = "$"
 
 TYPES = {
     MAX_CURRENT_LIMIT: (
-        number.NUMBER_SCHEMA.extend(
+        number.number_schema(
+            class_=Dxs238xwNumber,
+            icon="mdi:current-ac",
+            entity_category=ENTITY_CATEGORY_CONFIG,
+            unit_of_measurement=UNIT_AMPERE,
+        ).extend(
             {
-                cv.GenerateID(): cv.declare_id(Dxs238xwNumber),
-                cv.Optional(CONF_ICON, default="mdi:current-ac"): cv.icon,
-                cv.Optional(CONF_MODE, default="BOX"): cv.enum(NUMBER_MODES, upper=True),
-                cv.Optional(
-                    CONF_UNIT_OF_MEASUREMENT, default=UNIT_AMPERE
-                ): cv.string_strict,
-                cv.Optional(
-                    CONF_ENTITY_CATEGORY, default=ENTITY_CATEGORY_CONFIG
-                ): cv.entity_category,
+                cv.Optional(CONF_MODE, default="BOX"): cv.enum(
+                    NUMBER_MODES, upper=True
+                ),
             }
         ),
         SmLimitValue.MIN_CURRENT,
@@ -60,17 +54,16 @@ TYPES = {
         SmIdEntity.NUMBER_MAX_CURRENT_LIMIT,
     ),
     MAX_VOLTAGE_LIMIT: (
-        number.NUMBER_SCHEMA.extend(
+        number.number_schema(
+            class_=Dxs238xwNumber,
+            icon="mdi:sine-wave",
+            entity_category=ENTITY_CATEGORY_CONFIG,
+            unit_of_measurement=UNIT_VOLT,
+        ).extend(
             {
-                cv.GenerateID(): cv.declare_id(Dxs238xwNumber),
-                cv.Optional(CONF_ICON, default="mdi:sine-wave"): cv.icon,
-                cv.Optional(CONF_MODE, default="BOX"): cv.enum(NUMBER_MODES, upper=True),
-                cv.Optional(
-                    CONF_UNIT_OF_MEASUREMENT, default=UNIT_VOLT
-                ): cv.string_strict,
-                cv.Optional(
-                    CONF_ENTITY_CATEGORY, default=ENTITY_CATEGORY_CONFIG
-                ): cv.entity_category,
+                cv.Optional(CONF_MODE, default="BOX"): cv.enum(
+                    NUMBER_MODES, upper=True
+                ),
             }
         ),
         SmLimitValue.MIN_VOLTAGE,
@@ -79,17 +72,16 @@ TYPES = {
         SmIdEntity.NUMBER_MAX_VOLTAGE_LIMIT,
     ),
     MIN_VOLTAGE_LIMIT: (
-        number.NUMBER_SCHEMA.extend(
+        number.number_schema(
+            class_=Dxs238xwNumber,
+            icon="mdi:sine-wave",
+            entity_category=ENTITY_CATEGORY_CONFIG,
+            unit_of_measurement=UNIT_VOLT,
+        ).extend(
             {
-                cv.GenerateID(): cv.declare_id(Dxs238xwNumber),
-                cv.Optional(CONF_ICON, default="mdi:sine-wave"): cv.icon,
-                cv.Optional(CONF_MODE, default="BOX"): cv.enum(NUMBER_MODES, upper=True),
-                cv.Optional(
-                    CONF_UNIT_OF_MEASUREMENT, default=UNIT_VOLT
-                ): cv.string_strict,
-                cv.Optional(
-                    CONF_ENTITY_CATEGORY, default=ENTITY_CATEGORY_CONFIG
-                ): cv.entity_category,
+                cv.Optional(CONF_MODE, default="BOX"): cv.enum(
+                    NUMBER_MODES, upper=True
+                ),
             }
         ),
         SmLimitValue.MIN_VOLTAGE,
@@ -98,17 +90,16 @@ TYPES = {
         SmIdEntity.NUMBER_MIN_VOLTAGE_LIMIT,
     ),
     ENERGY_PURCHASE_VALUE: (
-        number.NUMBER_SCHEMA.extend(
+        number.number_schema(
+            class_=Dxs238xwNumber,
+            icon="mdi:lightning-bolt",
+            entity_category=ENTITY_CATEGORY_CONFIG,
+            unit_of_measurement=UNIT_KILOWATT_HOURS,
+        ).extend(
             {
-                cv.GenerateID(): cv.declare_id(Dxs238xwNumber),
-                cv.Optional(CONF_ICON, default="mdi:lightning-bolt"): cv.icon,
-                cv.Optional(CONF_MODE, default="BOX"): cv.enum(NUMBER_MODES, upper=True),
-                cv.Optional(
-                    CONF_UNIT_OF_MEASUREMENT, default=UNIT_KILOWATT_HOURS
-                ): cv.string_strict,
-                cv.Optional(
-                    CONF_ENTITY_CATEGORY, default=ENTITY_CATEGORY_CONFIG
-                ): cv.entity_category,
+                cv.Optional(CONF_MODE, default="BOX"): cv.enum(
+                    NUMBER_MODES, upper=True
+                ),
             }
         ),
         SmLimitValue.MIN_ENERGY_PURCHASE_VALUE,
@@ -117,17 +108,16 @@ TYPES = {
         SmIdEntity.NUMBER_ENERGY_PURCHASE_VALUE,
     ),
     ENERGY_PURCHASE_ALARM: (
-        number.NUMBER_SCHEMA.extend(
+        number.number_schema(
+            class_=Dxs238xwNumber,
+            icon="mdi:lightning-bolt",
+            entity_category=ENTITY_CATEGORY_CONFIG,
+            unit_of_measurement=UNIT_KILOWATT_HOURS,
+        ).extend(
             {
-                cv.GenerateID(): cv.declare_id(Dxs238xwNumber),
-                cv.Optional(CONF_ICON, default="mdi:lightning-bolt"): cv.icon,
-                cv.Optional(CONF_MODE, default="BOX"): cv.enum(NUMBER_MODES, upper=True),
-                cv.Optional(
-                    CONF_UNIT_OF_MEASUREMENT, default=UNIT_KILOWATT_HOURS
-                ): cv.string_strict,
-                cv.Optional(
-                    CONF_ENTITY_CATEGORY, default=ENTITY_CATEGORY_CONFIG
-                ): cv.entity_category,
+                cv.Optional(CONF_MODE, default="BOX"): cv.enum(
+                    NUMBER_MODES, upper=True
+                ),
             }
         ),
         SmLimitValue.MIN_ENERGY_PURCHASE_ALARM,
@@ -136,17 +126,16 @@ TYPES = {
         SmIdEntity.NUMBER_ENERGY_PURCHASE_ALARM,
     ),
     DELAY_VALUE_SET: (
-        number.NUMBER_SCHEMA.extend(
+        number.number_schema(
+            class_=Dxs238xwNumber,
+            icon="mdi:timer-cog-outline",
+            entity_category=ENTITY_CATEGORY_CONFIG,
+            unit_of_measurement=UNIT_MINUTE,
+        ).extend(
             {
-                cv.GenerateID(): cv.declare_id(Dxs238xwNumber),
-                cv.Optional(CONF_ICON, default="mdi:timer-cog-outline"): cv.icon,
-                cv.Optional(CONF_MODE, default="BOX"): cv.enum(NUMBER_MODES, upper=True),
-                cv.Optional(
-                    CONF_UNIT_OF_MEASUREMENT, default=UNIT_MINUTE
-                ): cv.string_strict,
-                cv.Optional(
-                    CONF_ENTITY_CATEGORY, default=ENTITY_CATEGORY_CONFIG
-                ): cv.entity_category,
+                cv.Optional(CONF_MODE, default="BOX"): cv.enum(
+                    NUMBER_MODES, upper=True
+                ),
             }
         ),
         SmLimitValue.MIN_DELAY_SET,
@@ -155,17 +144,16 @@ TYPES = {
         SmIdEntity.NUMBER_DELAY_VALUE_SET,
     ),
     STARTING_KWH: (
-        number.NUMBER_SCHEMA.extend(
+        number.number_schema(
+            class_=Dxs238xwNumber,
+            icon="mdi:home-lightning-bolt-outline",
+            entity_category=ENTITY_CATEGORY_CONFIG,
+            unit_of_measurement=UNIT_KILOWATT_HOURS,
+        ).extend(
             {
-                cv.GenerateID(): cv.declare_id(Dxs238xwNumber),
-                cv.Optional(CONF_ICON, default="mdi:home-lightning-bolt-outline"): cv.icon,
-                cv.Optional(CONF_MODE, default="BOX"): cv.enum(NUMBER_MODES, upper=True),
-                cv.Optional(
-                    CONF_UNIT_OF_MEASUREMENT, default=UNIT_KILOWATT_HOURS
-                ): cv.string_strict,
-                cv.Optional(
-                    CONF_ENTITY_CATEGORY, default=ENTITY_CATEGORY_CONFIG
-                ): cv.entity_category,
+                cv.Optional(CONF_MODE, default="BOX"): cv.enum(
+                    NUMBER_MODES, upper=True
+                ),
             }
         ),
         SmLimitValue.MIN_STARTING_KWH + 0.0,
@@ -174,17 +162,16 @@ TYPES = {
         SmIdEntity.NUMBER_STARTING_KWH,
     ),
     PRICE_KWH: (
-        number.NUMBER_SCHEMA.extend(
+        number.number_schema(
+            class_=Dxs238xwNumber,
+            icon="mdi:cash",
+            entity_category=ENTITY_CATEGORY_CONFIG,
+            unit_of_measurement=UNIT_CURRENCY_DOLLAR,
+        ).extend(
             {
-                cv.GenerateID(): cv.declare_id(Dxs238xwNumber),
-                cv.Optional(CONF_ICON, default="mdi:cash"): cv.icon,
-                cv.Optional(CONF_MODE, default="BOX"): cv.enum(NUMBER_MODES, upper=True),
-                cv.Optional(
-                    CONF_UNIT_OF_MEASUREMENT, default=UNIT_CURRENCY_DOLLAR
-                ): cv.string_strict,
-                cv.Optional(
-                    CONF_ENTITY_CATEGORY, default=ENTITY_CATEGORY_CONFIG
-                ): cv.entity_category,
+                cv.Optional(CONF_MODE, default="BOX"): cv.enum(
+                    NUMBER_MODES, upper=True
+                ),
             }
         ),
         SmLimitValue.MIN_PRICE_KWH + 0.0,
