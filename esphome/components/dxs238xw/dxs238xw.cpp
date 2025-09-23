@@ -162,7 +162,7 @@ void Dxs238xwComponent::update() {
 }
 
 void Dxs238xwComponent::dump_config() {
-  LOG_UPDATE_INTERVAL(this)
+  LOG_UPDATE_INTERVAL(this);
   ESP_LOGCONFIG(TAG, "*** COMPONENT VERSION: %s ***", SM_STR_COMPONENT_VERSION);
 }
 
