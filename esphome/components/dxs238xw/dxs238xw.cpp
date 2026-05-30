@@ -557,7 +557,7 @@ bool Dxs238xwComponent::receive_serial_data_(uint8_t *array, uint8_t type_messag
           ESP_LOGV(TAG, "* WRONG_BYTES: HEKR_TYPE_MESSAGE / Expected = %u, Receive = %u", type_message, array[2]);
           read_error = SmErrorCode::WRONG_BYTES_TYPE_MESSAGE;
           break;
-        } else if (index_size == 4 && cmd > 0 && array[4] != cmd) {
+        } else if (index_size == 4 && cmd > 0 && array[4] != cmd && array[2] != 0xFE) {
           ESP_LOGV(TAG, "* WRONG_BYTES: HEKR_COMMAND / Expected = %u, Receive = %u", cmd, array[4]);
           read_error = SmErrorCode::WRONG_BYTES_COMMAND;
           break;
