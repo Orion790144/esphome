@@ -565,7 +565,7 @@ bool Dxs238xwComponent::receive_serial_data_(uint8_t *array, uint8_t type_messag
           if (index_size == array[1] - 1) {
             ESP_LOGV(TAG, "* Message received: %s", format_hex_pretty(array, array[1]).c_str());
 
-            if (this->calculate_crc_(array, array[1]) != array[index_size]) {
+            if (array[2] != 0xFE && this->calculate_crc_(array, array[1]) != array[index_size]) {
               read_error = SmErrorCode::CRC;
             }
 
