@@ -770,12 +770,11 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
       break;
     }
     case 0x21: {
-      // Firmware antiguo - mensaje de medición formato legacy
-      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, ((receive_array[5] << 8) | receive_array[6]) * 0.1)
-      UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_1, ((receive_array[7] << 8) | receive_array[8]) * 0.001)
-      UPDATE_SENSOR_MEASUREMENTS_POWER(active_power_phase_1, ((receive_array[9] << 16) | (receive_array[10] << 8) | receive_array[11]) * 0.0001)
-      UPDATE_SENSOR_MEASUREMENTS(power_factor_phase_1, ((receive_array[12] << 8) | receive_array[13]) * 0.001)
-      UPDATE_SENSOR_MEASUREMENTS(frequency, ((receive_array[14] << 8) | receive_array[15]) * 0.01)
+      UPDATE_SENSOR_MEASUREMENTS(frequency, ((receive_array[5] << 8) | receive_array[6]) * 0.01)
+      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, ((receive_array[7] << 8) | receive_array[8]) * 0.1)
+      UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_1, ((receive_array[9] << 8) | receive_array[10]) * 0.01)
+      UPDATE_SENSOR_MEASUREMENTS_POWER(active_power_phase_1, ((receive_array[11] << 16) | (receive_array[12] << 8) | receive_array[13]) * 0.0001)
+      UPDATE_SENSOR_MEASUREMENTS(power_factor_phase_1, ((receive_array[14] << 8) | receive_array[15]) * 0.001)
       UPDATE_SENSOR_MEASUREMENTS(total_energy, ((receive_array[16] << 24) | (receive_array[17] << 16) | (receive_array[18] << 8) | receive_array[19]) * 0.01)
       break;
     }
