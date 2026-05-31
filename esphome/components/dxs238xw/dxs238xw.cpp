@@ -702,7 +702,7 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
       UPDATE_SWITCH(delay_state, this->ms_data_.delay_state)
 
       UPDATE_SENSOR_MEASUREMENTS(total_energy, ((receive_array[7] << 24) | (receive_array[8] << 16) | (receive_array[9] << 8) | receive_array[10]) * 0.01)
-      UPDATE_SENSOR_MEASUREMENTS(active_power_phase_1, ((receive_array[13] << 8) | receive_array[14]) * 0.1)
+      UPDATE_SENSOR_MEASUREMENTS(active_power_phase_1, ((receive_array[13] << 8) | receive_array[14]) * 0.0001)
       
       this->update_meter_state_detail_();
 
