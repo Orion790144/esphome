@@ -622,14 +622,20 @@ bool Dxs238xwComponent::pre_receive_serial_data_(uint8_t cmd) {
 void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
   switch (receive_array[4]) {
     case HEKR_CMD_RECEIVE_METER_STATE: {
-      this->ms_data_.time = millis();
-
+            this->ms_data_.time = millis();
       this->ms_data_.phase_count = receive_array[5];
       this->ms_data_.meter_state = receive_array[6];
       this->ms_data_.delay_state = receive_array[18];
       this->ms_data_.delay_value_remaining = (receive_array[16] << 8) | receive_array[17];
 
-      this->ms_data_.total_energy = ((receive_array[7] << 24) | (receive_array[8] << 16) | (receive_array[9] << 8) | receive_array[10]) * 0.01;
+      // Firmware antiguo - mediciones en mensaje de estado
+      UPDATE_SENSOR_MEASUREMENTS(total_energy, ((receive_array[8] << 16) | (receive_array[9] << 8) | receive_array[10]) * 0.01);
+      UPDATE_SENSOR_MEASUREMENTS(active_power_phase_1, ((receive_array[13] << 8) | receive_array[14]) * 0.0001);
+
+      // === NUEVAS LECTURAS (para probar) ===
+      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, ((receive_array[9] << 8) | receive_array[10]) * 0.1);
+      UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_1, ((receive_array[11] << 8) | receive_array[12]) * 0.01);
+      UPDATE_SENSOR_MEASUREMENTS(frequency, ((receive_array[15] << 8) | receive_array[16]) * 0.01);
 
       if (this->ms_data_.meter_state) {
         this->ms_data_.warning_off_by_over_voltage = false;
@@ -639,86 +645,45 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
         this->ms_data_.warning_off_by_end_delay = false;
         this->ms_data_.warning_off_by_user = false;
       }
-
       if (!this->ms_data_.warning_off_by_over_voltage) {
         this->ms_data_.warning_off_by_over_voltage = (receive_array[11] == 1);
       }
-
       if (!this->ms_data_.warning_off_by_under_voltage) {
         this->ms_data_.warning_off_by_under_voltage = (receive_array[11] == 2);
       }
-
       if (!this->ms_data_.warning_off_by_over_current) {
         this->ms_data_.warning_off_by_over_current = receive_array[15];
       }
-
       if (!this->ms_data_.warning_off_by_end_purchase) {
         this->ms_data_.warning_off_by_end_purchase = (receive_array[1] == 21 ? receive_array[19] : false);
       }
-
       if (!this->ms_data_.warning_off_by_end_delay && this->get_component_state() == COMPONENT_STATE_LOOP) {
         this->ms_data_.warning_off_by_end_delay = (this->ms_data_.delay_value_remaining == 0 && this->ms_data_.delay_state);
       }
 
-      if (this->ms_data_.warning_off_by_end_delay && this->ms_data_.meter_state) {
-        ESP_LOGD(TAG, "* End Delay, trying to set Power State to off");
-
-        if (this->send_command_(SmCommandSend::SET_POWER_STATE, false, false)) {
-          this->ms_data_.meter_state = receive_array[6];
-        }
-
-        ESP_LOGD(TAG, "* New Power State = %s", ONOFF(this->ms_data_.meter_state));
-      }
-
-      if ((this->ms_data_.warning_off_by_end_delay && this->ms_data_.delay_state) || (this->get_component_state() == COMPONENT_STATE_SETUP && this->ms_data_.delay_state)) {
-        ESP_LOGD(TAG, "* End Delay, trying to set Delay State to off");
-
-        if (this->send_command_(SmCommandSend::SET_DELAY, false, false)) {
-          this->ms_data_.delay_state = receive_array[18];
-        }
-
-        ESP_LOGD(TAG, "* New Delay State = %s", ONOFF(this->ms_data_.delay_state));
-      }
-
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
       UPDATE_TEXT_SENSOR(delay_value_remaining, this->get_delay_value_remaining_string_(this->ms_data_.delay_value_remaining))
-
       UPDATE_BINARY_SENSOR(warning_off_by_over_voltage, this->ms_data_.warning_off_by_over_voltage)
       UPDATE_BINARY_SENSOR(warning_off_by_under_voltage, this->ms_data_.warning_off_by_under_voltage)
       UPDATE_BINARY_SENSOR(warning_off_by_over_current, this->ms_data_.warning_off_by_over_current)
       UPDATE_BINARY_SENSOR(warning_off_by_end_purchase, this->ms_data_.warning_off_by_end_purchase)
       UPDATE_BINARY_SENSOR(warning_off_by_end_delay, this->ms_data_.warning_off_by_end_delay)
       UPDATE_BINARY_SENSOR(warning_off_by_user, this->ms_data_.warning_off_by_user)
-
       UPDATE_BINARY_SENSOR(meter_state, this->ms_data_.meter_state)
-
       UPDATE_SENSOR(phase_count, this->ms_data_.phase_count)
-
       UPDATE_SENSOR(contract_total_energy, this->ms_data_.starting_kWh + this->ms_data_.total_energy)
       UPDATE_SENSOR(total_energy_price, this->ms_data_.price_kWh * this->ms_data_.total_energy)
-
       UPDATE_SWITCH(meter_state, this->ms_data_.meter_state)
       UPDATE_SWITCH(delay_state, this->ms_data_.delay_state)
 
-       ESP_LOGD(TAG, "State bytes: %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X",
-        receive_array[5], receive_array[6], receive_array[7], receive_array[8],
-        receive_array[9], receive_array[10], receive_array[11], receive_array[12],
-        receive_array[13], receive_array[14], receive_array[15], receive_array[16],
-        receive_array[17], receive_array[18], receive_array[19]);
-      // Diagnóstico legacy firmware
+      // Diagnóstico
       ESP_LOGD(TAG, "State bytes [5..19]: %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X",
                receive_array[5], receive_array[6], receive_array[7], receive_array[8],
                receive_array[9], receive_array[10], receive_array[11], receive_array[12],
                receive_array[13], receive_array[14], receive_array[15], receive_array[16],
                receive_array[17], receive_array[18], receive_array[19]);
 
-      // Firmware antiguo - mediciones en mensaje de estado
-      UPDATE_SENSOR_MEASUREMENTS(total_energy, ((receive_array[8] << 16) | (receive_array[9] << 8) | receive_array[10]) * 0.01);
-      UPDATE_SENSOR_MEASUREMENTS(active_power_phase_1, ((receive_array[13] << 8) | receive_array[14]) * 0.0001);
-      
       this->update_meter_state_detail_();
-
       break;
     }
     case HEKR_CMD_RECEIVE_MEASUREMENT: {
