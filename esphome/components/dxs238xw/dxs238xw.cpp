@@ -701,6 +701,9 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
       UPDATE_SWITCH(meter_state, this->ms_data_.meter_state)
       UPDATE_SWITCH(delay_state, this->ms_data_.delay_state)
 
+      UPDATE_SENSOR_MEASUREMENTS(total_energy, ((receive_array[7] << 24) | (receive_array[8] << 16) | (receive_array[9] << 8) | receive_array[10]) * 0.01)
+      UPDATE_SENSOR_MEASUREMENTS_POWER(active_power_phase_1, ((receive_array[13] << 8) | receive_array[14]) * 0.1)
+      
       this->update_meter_state_detail_();
 
       break;
@@ -767,14 +770,6 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
 
       UPDATE_BINARY_SENSOR(warning_purchase_alarm, this->ms_data_.warning_purchase_alarm)
 
-      break;
-    }
-    case 0x21: {
-      ESP_LOGD(TAG, "Legacy msg bytes: %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X",
-        receive_array[5], receive_array[6], receive_array[7], receive_array[8],
-        receive_array[9], receive_array[10], receive_array[11], receive_array[12],
-        receive_array[13], receive_array[14], receive_array[15], receive_array[16],
-        receive_array[17], receive_array[18], receive_array[19], receive_array[20], receive_array[21]);
       break;
     }
     case HEKR_CMD_RECEIVE_METER_ID: {
