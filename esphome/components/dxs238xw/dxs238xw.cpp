@@ -706,9 +706,16 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
         receive_array[9], receive_array[10], receive_array[11], receive_array[12],
         receive_array[13], receive_array[14], receive_array[15], receive_array[16],
         receive_array[17], receive_array[18], receive_array[19]);
+      // Diagnóstico legacy firmware
+      ESP_LOGD(TAG, "State bytes [5..19]: %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X",
+               receive_array[5], receive_array[6], receive_array[7], receive_array[8],
+               receive_array[9], receive_array[10], receive_array[11], receive_array[12],
+               receive_array[13], receive_array[14], receive_array[15], receive_array[16],
+               receive_array[17], receive_array[18], receive_array[19]);
 
-      UPDATE_SENSOR_MEASUREMENTS(total_energy, ((receive_array[7] << 24) | (receive_array[8] << 16) | (receive_array[9] << 8) | receive_array[10]) * 0.01)
-      UPDATE_SENSOR_MEASUREMENTS(active_power_phase_1, ((receive_array[13] << 8) | receive_array[14]) * 0.0001)
+      // Firmware antiguo - mediciones en mensaje de estado
+      UPDATE_SENSOR_MEASUREMENTS(total_energy, ((receive_array[8] << 16) | (receive_array[9] << 8) | receive_array[10]) * 0.01);
+      UPDATE_SENSOR_MEASUREMENTS(active_power_phase_1, ((receive_array[13] << 8) | receive_array[14]) * 0.0001);
       
       this->update_meter_state_detail_();
 
