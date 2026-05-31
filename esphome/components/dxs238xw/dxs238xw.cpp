@@ -134,14 +134,20 @@ void Dxs238xwComponent::setup() {
   }
 }
 
+void Dxs238xwComponent::update() {
+  if (this->get_component_state() == COMPONENT_STATE_LOOP) {
+    this->send_command_(SmCommandSend::GET_MEASUREMENT_DATA);
+  }
+}
+
 void Dxs238xwComponent::loop() {
   this->incoming_messages_();
   this->send_command_(SmCommandSend::GET_POWER_STATE);
   this->send_command_(SmCommandSend::GET_LIMIT_AND_PURCHASE_DATA);
 
-  // === FORZAR MEDICIONES DETALLADAS (para probar voltaje) ===
+  // === FORZAR MEDICIONES DETALLADAS ===
   static uint32_t last_measurement = 0;
-  if (millis() - last_measurement > 1500) {   // cada 1.5 segundos
+  if (millis() - last_measurement > 1500) {
     ESP_LOGW(TAG, ">>> ENVIANDO GET_MEASUREMENT_DATA (forzado)");
     this->send_command_(SmCommandSend::GET_MEASUREMENT_DATA);
     last_measurement = millis();
