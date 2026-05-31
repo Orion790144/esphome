@@ -143,6 +143,7 @@ void Dxs238xwComponent::loop() {
 void Dxs238xwComponent::update() {
   if (this->get_component_state() == COMPONENT_STATE_LOOP) {
     this->send_command_(SmCommandSend::GET_MEASUREMENT_DATA);
+    this->send_command_(SmCommandSend::GET_POWER_STATE);   // también lo pedimos por si acaso
   }
 }
 
@@ -512,6 +513,15 @@ bool Dxs238xwComponent::pre_receive_serial_data_(uint8_t cmd) {
 }
 
 void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
+  void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
+  // === DEBUG: Mostrar TODOS los mensajes que llegan ===
+  if (receive_array[4] != HEKR_CMD_RECEIVE_METER_STATE &&
+      receive_array[4] != HEKR_CMD_RECEIVE_MEASUREMENT &&
+      receive_array[4] != HEKR_CMD_RECEIVE_LIMIT_AND_PURCHASE &&
+      receive_array[4] != HEKR_CMD_RECEIVE_METER_ID) {
+    ESP_LOGW(TAG, ">>> MENSAJE DESCONOCIDO: cmd=0x%02X len=%d", receive_array[4], receive_array[1]);
+    ESP_LOGW(TAG, ">>> Bytes: %s", format_hex_pretty(receive_array, receive_array[1]).c_str());
+  }
   switch (receive_array[4]) {
     case HEKR_CMD_RECEIVE_METER_STATE: {
       this->ms_data_.time = millis();
