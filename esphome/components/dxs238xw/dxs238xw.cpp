@@ -512,6 +512,13 @@ bool Dxs238xwComponent::pre_receive_serial_data_(uint8_t cmd) {
 }
 
 void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
+    // === VOLTAJE DESDE MENSAJE LEGACY (48.16.FE.01.21) ===
+  if (receive_array[2] == 0xFE && receive_array[4] == 0x21) {
+    float voltage_legacy = ((receive_array[5] << 8) | receive_array[6]) * 0.00425;
+    UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, voltage_legacy);
+    ESP_LOGD(TAG, "VOLTAJE LEGACY: bytes[5-6]=0x%02X%02X → %.1f V", 
+             receive_array[5], receive_array[6], voltage_legacy);
+  }
   switch (receive_array[4]) {
     case HEKR_CMD_RECEIVE_METER_STATE: {
       this->ms_data_.time = millis();
