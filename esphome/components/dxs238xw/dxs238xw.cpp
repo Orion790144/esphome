@@ -628,14 +628,18 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
       this->ms_data_.delay_state = receive_array[18];
       this->ms_data_.delay_value_remaining = (receive_array[16] << 8) | receive_array[17];
       
-                  // Firmware antiguo - mediciones en mensaje de estado
+                        // Firmware antiguo - mediciones en mensaje de estado (DDS238-4W viejo)
       UPDATE_SENSOR_MEASUREMENTS(total_energy, ((receive_array[8] << 16) | (receive_array[9] << 8) | receive_array[10]) * 0.01);
       UPDATE_SENSOR_MEASUREMENTS(active_power_phase_1, ((receive_array[13] << 8) | receive_array[14]) * 0.0001);
 
-      // === NUEVOS FACTORES ===
-      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, ((receive_array[8] << 8) | receive_array[9]) * 0.085);        // Voltaje
-      UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_1, ((receive_array[13] << 8) | receive_array[14]) * 0.00045); // Corriente
-      UPDATE_SENSOR_MEASUREMENTS(frequency, ((receive_array[15] << 8) | receive_array[16]) * 0.01);             // Frecuencia
+      // Voltaje correcto (bytes 8-9)
+      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, ((receive_array[8] << 8) | receive_array[9]) * 0.0214);
+
+      // Corriente (ya funcionaba bien)
+      UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_1, ((receive_array[13] << 8) | receive_array[14]) * 0.00045);
+
+      // Frecuencia (prueba con bytes 15-16)
+      UPDATE_SENSOR_MEASUREMENTS(frequency, ((receive_array[15] << 8) | receive_array[16]) * 0.01);
       
       if (this->ms_data_.meter_state) {
         this->ms_data_.warning_off_by_over_voltage = false;
