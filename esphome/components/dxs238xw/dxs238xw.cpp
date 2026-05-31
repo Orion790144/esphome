@@ -568,6 +568,11 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
     }
 
     case HEKR_CMD_RECEIVE_MEASUREMENT: {
+            ESP_LOGD(TAG, ">>> RECIBIDO GET_MEASUREMENT_DATA (len=%d)", receive_array[1]);
+      ESP_LOGD(TAG, ">>> Bytes 14-15 (posible voltaje): %02X %02X → raw=%d → calculado=%.1f V",
+               receive_array[14], receive_array[15],
+               ((receive_array[14] << 8) | receive_array[15]),
+               ((receive_array[14] << 8) | receive_array[15]) * 0.1);
       UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_1, ((receive_array[5] << 16) | (receive_array[6] << 8) | receive_array[7]) * 0.001);
       UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_2, ((receive_array[8] << 16) | (receive_array[9] << 8) | receive_array[10]) * 0.001);
       UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_3, ((receive_array[11] << 16) | (receive_array[12] << 8) | receive_array[13]) * 0.001);
