@@ -589,28 +589,21 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
       break;
     }
 
-    case HEKR_CMD_RECEIVE_MEASUREMENT: {
-      ESP_LOGD(TAG, ">>> RECIBIDO MENSAJE DE MEDICIONES DETALLADAS (len=%d)", receive_array[1]);
+        case HEKR_CMD_RECEIVE_MEASUREMENT: {
+      // === VOLTAJE (bytes 14-15 × 0.1) ===
+      float voltage = ((receive_array[14] << 8) | receive_array[15]) * 0.1;
+      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, voltage);
 
-      // === PRUEBA DE VOLTAJE EN MENSAJE DE MEDICIONES ===
-      float v1 = ((receive_array[14] << 8) | receive_array[15]) * 0.1;
-      float v2 = ((receive_array[15] << 8) | receive_array[16]) * 0.1;
-      float v3 = ((receive_array[16] << 8) | receive_array[17]) * 0.1;
-      float v4 = ((receive_array[13] << 8) | receive_array[14]) * 0.1;
-      float v5 = ((receive_array[17] << 8) | receive_array[18]) * 0.1;
-
-      ESP_LOGD(TAG, "MEDICIONES VOLTAJE TEST: v1(14-15)=%.1f  v2(15-16)=%.1f  v3(16-17)=%.1f  v4(13-14)=%.1f  v5(17-18)=%.1f",
-               v1, v2, v3, v4, v5);
-
-      // Usamos temporalmente v1 (el más común)
-      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, v1);
-
-      // Resto de sensores (dejalo igual)
+      // Corrientes (3 fases)
       UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_1, ((receive_array[5] << 16) | (receive_array[6] << 8) | receive_array[7]) * 0.001);
       UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_2, ((receive_array[8] << 16) | (receive_array[9] << 8) | receive_array[10]) * 0.001);
       UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_3, ((receive_array[11] << 16) | (receive_array[12] << 8) | receive_array[13]) * 0.001);
-      UPDATE_SENSOR_MEASUREMENTS_POWER(reactive_power_total, ((receive_array[20] << 16) | (receive_array[21] << 8) | receive_array[22]) * 0.0001);
+
+      // Potencias
       UPDATE_SENSOR_MEASUREMENTS_POWER(active_power_total, ((receive_array[32] << 16) | (receive_array[33] << 8) | receive_array[34]) * 0.0001);
+      UPDATE_SENSOR_MEASUREMENTS_POWER(reactive_power_total, ((receive_array[20] << 16) | (receive_array[21] << 8) | receive_array[22]) * 0.0001);
+
+      // Frecuencia y Energía Total
       UPDATE_SENSOR_MEASUREMENTS(frequency, ((receive_array[52] << 8) | receive_array[53]) * 0.01);
       UPDATE_SENSOR_MEASUREMENTS(total_energy, ((receive_array[54] << 24) | (receive_array[55] << 16) | (receive_array[56] << 8) | receive_array[57]) * 0.01);
 
