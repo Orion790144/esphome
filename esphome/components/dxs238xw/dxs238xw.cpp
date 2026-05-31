@@ -620,6 +620,16 @@ bool Dxs238xwComponent::pre_receive_serial_data_(uint8_t cmd) {
 }
 
 void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
+    // === DEBUG LEGACY 0xFE.01.21 (afuera del case) ===
+  if (receive_array[2] == 0xFE && receive_array[4] == 0x21) {
+    ESP_LOGD(TAG, ">>> LEGACY 0xFE.01.21 DETECTADO - len=%d", receive_array[1]);
+    ESP_LOGD(TAG, ">>> BYTES: %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X",
+             receive_array[0], receive_array[1], receive_array[2], receive_array[3], receive_array[4],
+             receive_array[5], receive_array[6], receive_array[7], receive_array[8], receive_array[9],
+             receive_array[10], receive_array[11], receive_array[12], receive_array[13], receive_array[14],
+             receive_array[15], receive_array[16], receive_array[17], receive_array[18], receive_array[19],
+             receive_array[20], receive_array[21]);
+  }
   switch (receive_array[4]) {
     case HEKR_CMD_RECEIVE_METER_STATE: {
                 // === PROBAR VOLTAJE EN MENSAJE LEGACY 0xFE.01.21 ===
