@@ -582,28 +582,30 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
     }
 
     case HEKR_CMD_RECEIVE_MEASUREMENT: {
+      ESP_LOGD(TAG, ">>> RECIBIDO MENSAJE DE MEDICIONES DETALLADAS (len=%d)", receive_array[1]);
+
+      // === PRUEBA DE VOLTAJE EN MENSAJE DE MEDICIONES ===
+      float v1 = ((receive_array[14] << 8) | receive_array[15]) * 0.1;
+      float v2 = ((receive_array[15] << 8) | receive_array[16]) * 0.1;
+      float v3 = ((receive_array[16] << 8) | receive_array[17]) * 0.1;
+      float v4 = ((receive_array[13] << 8) | receive_array[14]) * 0.1;
+      float v5 = ((receive_array[17] << 8) | receive_array[18]) * 0.1;
+
+      ESP_LOGD(TAG, "MEDICIONES VOLTAJE TEST: v1(14-15)=%.1f  v2(15-16)=%.1f  v3(16-17)=%.1f  v4(13-14)=%.1f  v5(17-18)=%.1f",
+               v1, v2, v3, v4, v5);
+
+      // Usamos temporalmente v1 (el más común)
+      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, v1);
+
+      // Resto de sensores (dejalo igual)
       UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_1, ((receive_array[5] << 16) | (receive_array[6] << 8) | receive_array[7]) * 0.001);
       UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_2, ((receive_array[8] << 16) | (receive_array[9] << 8) | receive_array[10]) * 0.001);
       UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_3, ((receive_array[11] << 16) | (receive_array[12] << 8) | receive_array[13]) * 0.001);
-      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, ((receive_array[14] << 8) | receive_array[15]) * 0.1);
-      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_2, ((receive_array[16] << 8) | receive_array[17]) * 0.1);
-      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_3, ((receive_array[18] << 8) | receive_array[19]) * 0.1);
       UPDATE_SENSOR_MEASUREMENTS_POWER(reactive_power_total, ((receive_array[20] << 16) | (receive_array[21] << 8) | receive_array[22]) * 0.0001);
-      UPDATE_SENSOR_MEASUREMENTS_POWER(reactive_power_phase_1, ((receive_array[23] << 16) | (receive_array[24] << 8) | receive_array[25]) * 0.0001);
-      UPDATE_SENSOR_MEASUREMENTS_POWER(reactive_power_phase_2, ((receive_array[26] << 16) | (receive_array[27] << 8) | receive_array[28]) * 0.0001);
-      UPDATE_SENSOR_MEASUREMENTS_POWER(reactive_power_phase_3, ((receive_array[29] << 16) | (receive_array[30] << 8) | receive_array[31]) * 0.0001);
       UPDATE_SENSOR_MEASUREMENTS_POWER(active_power_total, ((receive_array[32] << 16) | (receive_array[33] << 8) | receive_array[34]) * 0.0001);
-      UPDATE_SENSOR_MEASUREMENTS_POWER(active_power_phase_1, ((receive_array[35] << 16) | (receive_array[36] << 8) | receive_array[37]) * 0.0001);
-      UPDATE_SENSOR_MEASUREMENTS_POWER(active_power_phase_2, ((receive_array[38] << 16) | (receive_array[39] << 8) | receive_array[40]) * 0.0001);
-      UPDATE_SENSOR_MEASUREMENTS_POWER(active_power_phase_3, ((receive_array[41] << 16) | (receive_array[42] << 8) | receive_array[43]) * 0.0001);
-      UPDATE_SENSOR_MEASUREMENTS(power_factor_total, ((receive_array[44] << 8) | receive_array[45]) * 0.001);
-      UPDATE_SENSOR_MEASUREMENTS(power_factor_phase_1, ((receive_array[46] << 8) | receive_array[47]) * 0.001);
-      UPDATE_SENSOR_MEASUREMENTS(power_factor_phase_2, ((receive_array[48] << 8) | receive_array[49]) * 0.001);
-      UPDATE_SENSOR_MEASUREMENTS(power_factor_phase_3, ((receive_array[50] << 8) | receive_array[51]) * 0.001);
-      UPDATE_SENSOR_MEASUREMENTS(total_energy, ((receive_array[54] << 24) | (receive_array[55] << 16) | (receive_array[56] << 8) | receive_array[57]) * 0.01);
-      UPDATE_SENSOR_MEASUREMENTS(import_active_energy, ((receive_array[58] << 24) | (receive_array[59] << 16) | (receive_array[60] << 8) | receive_array[61]) * 0.01);
-      UPDATE_SENSOR_MEASUREMENTS(export_active_energy, ((receive_array[62] << 24) | (receive_array[63] << 16) | (receive_array[64] << 8) | receive_array[65]) * -0.01);
       UPDATE_SENSOR_MEASUREMENTS(frequency, ((receive_array[52] << 8) | receive_array[53]) * 0.01);
+      UPDATE_SENSOR_MEASUREMENTS(total_energy, ((receive_array[54] << 24) | (receive_array[55] << 16) | (receive_array[56] << 8) | receive_array[57]) * 0.01);
+
       break;
     }
 
