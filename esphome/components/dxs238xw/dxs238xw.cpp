@@ -589,48 +589,33 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
       break;
     }
 
-            case HEKR_CMD_RECEIVE_MEASUREMENT: {
+                case HEKR_CMD_RECEIVE_MEASUREMENT: {
       // === DEBUG COMPLETO - TODOS LOS VALORES FALTANTES ===
 
-      // --- FACTOR DE POTENCIA (probar varios lugares) ---
+      // --- FACTOR DE POTENCIA ---
       float pf1 = ((receive_array[40] << 8) | receive_array[41]) * 0.001;
       float pf2 = ((receive_array[42] << 8) | receive_array[43]) * 0.001;
       float pf3 = ((receive_array[44] << 8) | receive_array[45]) * 0.001;
-      float pf4 = ((receive_array[38] << 8) | receive_array[39]) * 0.001;
 
-      ESP_LOGD(TAG, "PF TEST: pf1(40-41)=%.3f  pf2(42-43)=%.3f  pf3(44-45)=%.3f  pf4(38-39)=%.3f",
-               pf1, pf2, pf3, pf4);
+      ESP_LOGD(TAG, "PF TEST: pf1(40-41)=%.3f  pf2(42-43)=%.3f  pf3(44-45)=%.3f", pf1, pf2, pf3);
 
-      // Usamos temporalmente pf2 (el más probable)
-      if (this->power_factor_sensor_ != nullptr) {
-        this->power_factor_sensor_->publish_state(pf2);
-      }
+      // Usamos pf2 (el más probable)
+      UPDATE_SENSOR(power_factor_total, pf2);
 
-      // --- POTENCIA REACTIVA (probar varios lugares) ---
+      // --- POTENCIA REACTIVA ---
       float q1 = ((receive_array[20] << 16) | (receive_array[21] << 8) | receive_array[22]) * 0.0001;
       float q2 = ((receive_array[23] << 16) | (receive_array[24] << 8) | receive_array[25]) * 0.0001;
-      float q3 = ((receive_array[26] << 16) | (receive_array[27] << 8) | receive_array[28]) * 0.0001;
 
-      ESP_LOGD(TAG, "Q TEST: q1(20-22)=%.3f  q2(23-25)=%.3f  q3(26-28)=%.3f", q1, q2, q3);
+      ESP_LOGD(TAG, "Q TEST: q1(20-22)=%.3f  q2(23-25)=%.3f", q1, q2);
 
-      if (this->reactive_power_total_sensor_ != nullptr) {
-        this->reactive_power_total_sensor_->publish_state(q1);
-      }
+      UPDATE_SENSOR(reactive_power_total, q1);
 
-      // --- ENERGÍA IMPORTADA Y EXPORTADA (al final del mensaje) ---
-      float import_kwh = ((receive_array[58] << 24) | (receive_array[59] << 16) | (receive_array[60] << 8) | receive_array[61]) * 0.01;
-      float export_kwh = ((receive_array[62] << 24) | (receive_array[63] << 16) | (receive_array[64] << 8) | receive_array[65]) * 0.01;
+      // --- ENERGÍA IMPORTADA / EXPORTADA (comentado hasta que declares los sensores) ---
+      // float import_kwh = ((receive_array[58] << 24) | (receive_array[59] << 16) | (receive_array[60] << 8) | receive_array[61]) * 0.01;
+      // float export_kwh = ((receive_array[62] << 24) | (receive_array[63] << 16) | (receive_array[64] << 8) | receive_array[65]) * 0.01;
+      // ESP_LOGD(TAG, "ENERGY TEST: import=%.2f  export=%.2f", import_kwh, export_kwh);
 
-      ESP_LOGD(TAG, "ENERGY TEST: import(58-61)=%.2f  export(62-65)=%.2f", import_kwh, export_kwh);
-
-      if (this->energy_imported_sensor_ != nullptr) {
-        this->energy_imported_sensor_->publish_state(import_kwh);
-      }
-      if (this->energy_exported_sensor_ != nullptr) {
-        this->energy_exported_sensor_->publish_state(export_kwh);
-      }
-
-      // === VOLTAJE, CORRIENTE, POTENCIA ACTIVA Y FRECUENCIA (ya funcionando) ===
+      // === VALORES QUE YA FUNCIONAN ===
       float voltage = ((receive_array[14] << 8) | receive_array[15]) * 0.1;
       UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, voltage);
 
