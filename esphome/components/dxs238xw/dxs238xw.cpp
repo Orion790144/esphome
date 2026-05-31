@@ -589,21 +589,21 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
       break;
     }
 
-                    case HEKR_CMD_RECEIVE_MEASUREMENT: {
-      // === FACTOR DE POTENCIA (confirmado) ===
+                        case HEKR_CMD_RECEIVE_MEASUREMENT: {
+      // === FACTOR DE POTENCIA (corregido) ===
       float power_factor = ((receive_array[44] << 8) | receive_array[45]) * 0.001;
-      UPDATE_SENSOR(power_factor_total, power_factor);
+      UPDATE_SENSOR(power_factor_phase_1, power_factor);
 
-      // === POTENCIA REACTIVA (confirmado) ===
+      // === POTENCIA REACTIVA (corregido) ===
       float reactive_power = ((receive_array[20] << 16) | (receive_array[21] << 8) | receive_array[22]) * 0.001;
-      UPDATE_SENSOR(reactive_power_total, reactive_power);
+      UPDATE_SENSOR(reactive_power_phase_1, reactive_power);
 
       // === VALORES YA FUNCIONANDO ===
       float voltage = ((receive_array[14] << 8) | receive_array[15]) * 0.1;
       UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, voltage);
 
       UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_1, ((receive_array[5] << 16) | (receive_array[6] << 8) | receive_array[7]) * 0.001);
-      UPDATE_SENSOR_MEASUREMENTS_POWER(active_power_total, ((receive_array[32] << 16) | (receive_array[33] << 8) | receive_array[34]) * 0.0001);
+      UPDATE_SENSOR_MEASUREMENTS_POWER(active_power_phase_1, ((receive_array[32] << 16) | (receive_array[33] << 8) | receive_array[34]) * 0.0001);
       UPDATE_SENSOR_MEASUREMENTS(frequency, ((receive_array[52] << 8) | receive_array[53]) * 0.01);
       UPDATE_SENSOR_MEASUREMENTS(total_energy, ((receive_array[54] << 24) | (receive_array[55] << 16) | (receive_array[56] << 8) | receive_array[57]) * 0.01);
 
