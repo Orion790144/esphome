@@ -553,11 +553,11 @@ bool Dxs238xwComponent::receive_serial_data_(uint8_t *array, uint8_t type_messag
           ESP_LOGV(TAG, "* WRONG_BYTES: HEKR_LENGTH / Expected = %u, Receive = %u", size_expected, array[1]);
           read_error = SmErrorCode::WRONG_BYTES_LENGTH;
           break;
-        } else if (index_size == 2 && array[2] != type_message && array[2] != 0xFE) {
+        } else if (index_size == 2 && array[2] != type_message && array[2] != 0xFE && array[2] != 0x02) {
           ESP_LOGV(TAG, "* WRONG_BYTES: HEKR_TYPE_MESSAGE / Expected = %u, Receive = %u", type_message, array[2]);
           read_error = SmErrorCode::WRONG_BYTES_TYPE_MESSAGE;
           break;
-        } else if (index_size == 4 && cmd > 0 && array[4] != cmd && array[2] != 0xFE) {
+        } else if (index_size == 4 && cmd > 0 && array[4] != cmd && array[2] != 0xFE && array[2] != 0x02) {
           ESP_LOGV(TAG, "* WRONG_BYTES: HEKR_COMMAND / Expected = %u, Receive = %u", cmd, array[4]);
           read_error = SmErrorCode::WRONG_BYTES_COMMAND;
           break;
@@ -565,7 +565,7 @@ bool Dxs238xwComponent::receive_serial_data_(uint8_t *array, uint8_t type_messag
           if (index_size == array[1] - 1) {
             ESP_LOGV(TAG, "* Message received: %s", format_hex_pretty(array, array[1]).c_str());
 
-            if (array[2] != 0xFE && this->calculate_crc_(array, array[1]) != array[index_size]) {
+            if (array[2] != 0xFE && array[2] != 0x02 && this->calculate_crc_(array, array[1]) != array[index_size]) {
               read_error = SmErrorCode::CRC;
             }
 
