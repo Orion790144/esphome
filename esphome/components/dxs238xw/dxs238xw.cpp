@@ -622,23 +622,23 @@ bool Dxs238xwComponent::pre_receive_serial_data_(uint8_t cmd) {
 void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
   switch (receive_array[4]) {
     case HEKR_CMD_RECEIVE_METER_STATE: {
-                                    this->ms_data_.time = millis();
+      this->ms_data_.time = millis();
       this->ms_data_.phase_count = receive_array[5];
       this->ms_data_.meter_state = receive_array[6];
       this->ms_data_.delay_state = receive_array[18];
       this->ms_data_.delay_value_remaining = (receive_array[16] << 8) | receive_array[17];
 
-      // === LECTURAS CORRECTAS PARA TU MEDIDOR (firmware viejo) ===
+      // === DIAGNÓSTICO DE VOLTAJE ===
+      uint16_t volt_raw = (receive_array[9] << 8) | receive_array[10];
+      float volt_calc = volt_raw * 0.01035;
+      
+      ESP_LOGD(TAG, "VOLTAJE DEBUG: bytes[9]=0x%02X bytes[10]=0x%02X → raw=%d → calculado=%.2f V", 
+               receive_array[9], receive_array[10], volt_raw, volt_calc);
+
       UPDATE_SENSOR_MEASUREMENTS(total_energy, ((receive_array[8] << 16) | (receive_array[9] << 8) | receive_array[10]) * 0.01);
       UPDATE_SENSOR_MEASUREMENTS(active_power_phase_1, ((receive_array[13] << 8) | receive_array[14]) * 0.0001);
-      
-      // VOLTAJE - bytes 9-10 (este es el correcto)
-      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, ((receive_array[9] << 8) | receive_array[10]) * 0.01035);
-      
-      // CORRIENTE - ya funcionaba bien
+      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, volt_calc);
       UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_1, ((receive_array[13] << 8) | receive_array[14]) * 0.00045);
-
-      // Frecuencia (no aparece clara en el mensaje 48.15 del firmware viejo)
       UPDATE_SENSOR_MEASUREMENTS(frequency, 50.0);
 
       if (this->ms_data_.meter_state) {
