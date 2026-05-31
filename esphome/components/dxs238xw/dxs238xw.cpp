@@ -622,6 +622,16 @@ bool Dxs238xwComponent::pre_receive_serial_data_(uint8_t cmd) {
 void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
   switch (receive_array[4]) {
     case HEKR_CMD_RECEIVE_METER_STATE: {
+            // === CAPTURAR MENSAJES LEGACY (0xFE / 0x21) ===
+      if (receive_array[2] == 0xFE || receive_array[3] == 0x21) {
+        ESP_LOGD(TAG, ">>> MENSAJE LEGACY DETECTADO - len=%d type=0x%02X cmd=0x%02X", 
+                 receive_array[1], receive_array[2], receive_array[3]);
+        char hex[128] = {0};
+        for(int i=0; i < min(30, (int)receive_array[1]+2); i++) {
+          sprintf(hex + strlen(hex), "%02X ", receive_array[i]);
+        }
+        ESP_LOGD(TAG, ">>> BYTES: %s", hex);
+      }
       this->ms_data_.time = millis();
       this->ms_data_.phase_count = receive_array[5];
       this->ms_data_.meter_state = receive_array[6];
