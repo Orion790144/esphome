@@ -770,12 +770,11 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
       break;
     }
     case 0x21: {
-      UPDATE_SENSOR_MEASUREMENTS(frequency, ((receive_array[5] << 8) | receive_array[6]) * 0.01)
-      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, ((receive_array[7] << 8) | receive_array[8]) * 0.1)
-      UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_1, ((receive_array[9] << 8) | receive_array[10]) * 0.01)
-      UPDATE_SENSOR_MEASUREMENTS_POWER(active_power_phase_1, ((receive_array[11] << 16) | (receive_array[12] << 8) | receive_array[13]) * 0.0001)
-      UPDATE_SENSOR_MEASUREMENTS(power_factor_phase_1, ((receive_array[14] << 8) | receive_array[15]) * 0.001)
-      UPDATE_SENSOR_MEASUREMENTS(total_energy, ((receive_array[16] << 24) | (receive_array[17] << 16) | (receive_array[18] << 8) | receive_array[19]) * 0.01)
+      ESP_LOGD(TAG, "Legacy msg bytes: %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X",
+        receive_array[5], receive_array[6], receive_array[7], receive_array[8],
+        receive_array[9], receive_array[10], receive_array[11], receive_array[12],
+        receive_array[13], receive_array[14], receive_array[15], receive_array[16],
+        receive_array[17], receive_array[18], receive_array[19], receive_array[20], receive_array[21]);
       break;
     }
     case HEKR_CMD_RECEIVE_METER_ID: {
