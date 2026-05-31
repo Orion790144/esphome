@@ -589,33 +589,16 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
       break;
     }
 
-                case HEKR_CMD_RECEIVE_MEASUREMENT: {
-      // === DEBUG COMPLETO - TODOS LOS VALORES FALTANTES ===
+                    case HEKR_CMD_RECEIVE_MEASUREMENT: {
+      // === FACTOR DE POTENCIA (confirmado) ===
+      float power_factor = ((receive_array[44] << 8) | receive_array[45]) * 0.001;
+      UPDATE_SENSOR(power_factor_total, power_factor);
 
-      // --- FACTOR DE POTENCIA ---
-      float pf1 = ((receive_array[40] << 8) | receive_array[41]) * 0.001;
-      float pf2 = ((receive_array[42] << 8) | receive_array[43]) * 0.001;
-      float pf3 = ((receive_array[44] << 8) | receive_array[45]) * 0.001;
+      // === POTENCIA REACTIVA (confirmado) ===
+      float reactive_power = ((receive_array[20] << 16) | (receive_array[21] << 8) | receive_array[22]) * 0.001;
+      UPDATE_SENSOR(reactive_power_total, reactive_power);
 
-      ESP_LOGD(TAG, "PF TEST: pf1(40-41)=%.3f  pf2(42-43)=%.3f  pf3(44-45)=%.3f", pf1, pf2, pf3);
-
-      // Usamos pf2 (el más probable)
-      UPDATE_SENSOR(power_factor_total, pf2);
-
-      // --- POTENCIA REACTIVA ---
-      float q1 = ((receive_array[20] << 16) | (receive_array[21] << 8) | receive_array[22]) * 0.0001;
-      float q2 = ((receive_array[23] << 16) | (receive_array[24] << 8) | receive_array[25]) * 0.0001;
-
-      ESP_LOGD(TAG, "Q TEST: q1(20-22)=%.3f  q2(23-25)=%.3f", q1, q2);
-
-      UPDATE_SENSOR(reactive_power_total, q1);
-
-      // --- ENERGÍA IMPORTADA / EXPORTADA (comentado hasta que declares los sensores) ---
-      // float import_kwh = ((receive_array[58] << 24) | (receive_array[59] << 16) | (receive_array[60] << 8) | receive_array[61]) * 0.01;
-      // float export_kwh = ((receive_array[62] << 24) | (receive_array[63] << 16) | (receive_array[64] << 8) | receive_array[65]) * 0.01;
-      // ESP_LOGD(TAG, "ENERGY TEST: import=%.2f  export=%.2f", import_kwh, export_kwh);
-
-      // === VALORES QUE YA FUNCIONAN ===
+      // === VALORES YA FUNCIONANDO ===
       float voltage = ((receive_array[14] << 8) | receive_array[15]) * 0.1;
       UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, voltage);
 
