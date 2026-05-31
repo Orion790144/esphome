@@ -595,7 +595,7 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
       UPDATE_SENSOR(power_factor_phase_1, power_factor);
 
       // === POTENCIA REACTIVA (corregido) ===
-      float reactive_power = ((receive_array[20] << 16) | (receive_array[21] << 8) | receive_array[22]) * 0.001;
+      float reactive_power = ((receive_array[20] << 16) | (receive_array[21] << 8) | receive_array[22]) * 0.0001;
       UPDATE_SENSOR(reactive_power_phase_1, reactive_power);
 
       // === VALORES YA FUNCIONANDO ===
