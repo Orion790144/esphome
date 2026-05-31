@@ -512,9 +512,6 @@ bool Dxs238xwComponent::pre_receive_serial_data_(uint8_t cmd) {
 }
 
 void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
-   
-  }
-
   switch (receive_array[4]) {
     case HEKR_CMD_RECEIVE_METER_STATE: {
       this->ms_data_.time = millis();
@@ -571,59 +568,49 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
     }
 
     case HEKR_CMD_RECEIVE_MEASUREMENT: {
-      UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_1, ((receive_array[5] << 16) | (receive_array[6] << 8) | receive_array[7]) * 0.001)
-      UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_2, ((receive_array[8] << 16) | (receive_array[9] << 8) | receive_array[10]) * 0.001)
-      UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_3, ((receive_array[11] << 16) | (receive_array[12] << 8) | receive_array[13]) * 0.001)
-      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, ((receive_array[14] << 8) | receive_array[15]) * 0.1)
-      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_2, ((receive_array[16] << 8) | receive_array[17]) * 0.1)
-      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_3, ((receive_array[18] << 8) | receive_array[19]) * 0.1)
-      UPDATE_SENSOR_MEASUREMENTS_POWER(reactive_power_total, ((receive_array[20] << 16) | (receive_array[21] << 8) | receive_array[22]) * 0.0001)
-      UPDATE_SENSOR_MEASUREMENTS_POWER(reactive_power_phase_1, ((receive_array[23] << 16) | (receive_array[24] << 8) | receive_array[25]) * 0.0001)
-      UPDATE_SENSOR_MEASUREMENTS_POWER(reactive_power_phase_2, ((receive_array[26] << 16) | (receive_array[27] << 8) | receive_array[28]) * 0.0001)
-      UPDATE_SENSOR_MEASUREMENTS_POWER(reactive_power_phase_3, ((receive_array[29] << 16) | (receive_array[30] << 8) | receive_array[31]) * 0.0001)
-      UPDATE_SENSOR_MEASUREMENTS_POWER(active_power_total, ((receive_array[32] << 16) | (receive_array[33] << 8) | receive_array[34]) * 0.0001)
-      UPDATE_SENSOR_MEASUREMENTS_POWER(active_power_phase_1, ((receive_array[35] << 16) | (receive_array[36] << 8) | receive_array[37]) * 0.0001)
-      UPDATE_SENSOR_MEASUREMENTS_POWER(active_power_phase_2, ((receive_array[38] << 16) | (receive_array[39] << 8) | receive_array[40]) * 0.0001)
-      UPDATE_SENSOR_MEASUREMENTS_POWER(active_power_phase_3, ((receive_array[41] << 16) | (receive_array[42] << 8) | receive_array[43]) * 0.0001)
-      UPDATE_SENSOR_MEASUREMENTS(power_factor_total, ((receive_array[44] << 8) | receive_array[45]) * 0.001)
-      UPDATE_SENSOR_MEASUREMENTS(power_factor_phase_1, ((receive_array[46] << 8) | receive_array[47]) * 0.001)
-      UPDATE_SENSOR_MEASUREMENTS(power_factor_phase_2, ((receive_array[48] << 8) | receive_array[49]) * 0.001)
-      UPDATE_SENSOR_MEASUREMENTS(power_factor_phase_3, ((receive_array[50] << 8) | receive_array[51]) * 0.001)
-      UPDATE_SENSOR_MEASUREMENTS(total_energy, ((receive_array[54] << 24) | (receive_array[55] << 16) | (receive_array[56] << 8) | receive_array[57]) * 0.01)
-      UPDATE_SENSOR_MEASUREMENTS(import_active_energy, ((receive_array[58] << 24) | (receive_array[59] << 16) | (receive_array[60] << 8) | receive_array[61]) * 0.01)
-      UPDATE_SENSOR_MEASUREMENTS(export_active_energy, ((receive_array[62] << 24) | (receive_array[63] << 16) | (receive_array[64] << 8) | receive_array[65]) * -0.01)
-      UPDATE_SENSOR_MEASUREMENTS(frequency, ((receive_array[52] << 8) | receive_array[53]) * 0.01)
+      UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_1, ((receive_array[5] << 16) | (receive_array[6] << 8) | receive_array[7]) * 0.001);
+      UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_2, ((receive_array[8] << 16) | (receive_array[9] << 8) | receive_array[10]) * 0.001);
+      UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_3, ((receive_array[11] << 16) | (receive_array[12] << 8) | receive_array[13]) * 0.001);
+      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, ((receive_array[14] << 8) | receive_array[15]) * 0.1);
+      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_2, ((receive_array[16] << 8) | receive_array[17]) * 0.1);
+      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_3, ((receive_array[18] << 8) | receive_array[19]) * 0.1);
+      UPDATE_SENSOR_MEASUREMENTS_POWER(reactive_power_total, ((receive_array[20] << 16) | (receive_array[21] << 8) | receive_array[22]) * 0.0001);
+      UPDATE_SENSOR_MEASUREMENTS_POWER(reactive_power_phase_1, ((receive_array[23] << 16) | (receive_array[24] << 8) | receive_array[25]) * 0.0001);
+      UPDATE_SENSOR_MEASUREMENTS_POWER(reactive_power_phase_2, ((receive_array[26] << 16) | (receive_array[27] << 8) | receive_array[28]) * 0.0001);
+      UPDATE_SENSOR_MEASUREMENTS_POWER(reactive_power_phase_3, ((receive_array[29] << 16) | (receive_array[30] << 8) | receive_array[31]) * 0.0001);
+      UPDATE_SENSOR_MEASUREMENTS_POWER(active_power_total, ((receive_array[32] << 16) | (receive_array[33] << 8) | receive_array[34]) * 0.0001);
+      UPDATE_SENSOR_MEASUREMENTS_POWER(active_power_phase_1, ((receive_array[35] << 16) | (receive_array[36] << 8) | receive_array[37]) * 0.0001);
+      UPDATE_SENSOR_MEASUREMENTS_POWER(active_power_phase_2, ((receive_array[38] << 16) | (receive_array[39] << 8) | receive_array[40]) * 0.0001);
+      UPDATE_SENSOR_MEASUREMENTS_POWER(active_power_phase_3, ((receive_array[41] << 16) | (receive_array[42] << 8) | receive_array[43]) * 0.0001);
+      UPDATE_SENSOR_MEASUREMENTS(power_factor_total, ((receive_array[44] << 8) | receive_array[45]) * 0.001);
+      UPDATE_SENSOR_MEASUREMENTS(power_factor_phase_1, ((receive_array[46] << 8) | receive_array[47]) * 0.001);
+      UPDATE_SENSOR_MEASUREMENTS(power_factor_phase_2, ((receive_array[48] << 8) | receive_array[49]) * 0.001);
+      UPDATE_SENSOR_MEASUREMENTS(power_factor_phase_3, ((receive_array[50] << 8) | receive_array[51]) * 0.001);
+      UPDATE_SENSOR_MEASUREMENTS(total_energy, ((receive_array[54] << 24) | (receive_array[55] << 16) | (receive_array[56] << 8) | receive_array[57]) * 0.01);
+      UPDATE_SENSOR_MEASUREMENTS(import_active_energy, ((receive_array[58] << 24) | (receive_array[59] << 16) | (receive_array[60] << 8) | receive_array[61]) * 0.01);
+      UPDATE_SENSOR_MEASUREMENTS(export_active_energy, ((receive_array[62] << 24) | (receive_array[63] << 16) | (receive_array[64] << 8) | receive_array[65]) * -0.01);
+      UPDATE_SENSOR_MEASUREMENTS(frequency, ((receive_array[52] << 8) | receive_array[53]) * 0.01);
       break;
     }
 
     case HEKR_CMD_RECEIVE_LIMIT_AND_PURCHASE: {
-            // === PROBANDO VOLTAJE EN MENSAJE 48.19 ===
-      float v1 = ((receive_array[7] << 8) | receive_array[8]) * 0.1;
-      float v2 = ((receive_array[8] << 8) | receive_array[9]) * 0.1;
-      float v3 = ((receive_array[9] << 8) | receive_array[10]) * 0.1;
-      float v4 = ((receive_array[10] << 8) | receive_array[11]) * 0.1;
-      float v5 = ((receive_array[11] << 8) | receive_array[12]) * 0.1;
-      float v6 = ((receive_array[12] << 8) | receive_array[13]) * 0.1;
-
-      ESP_LOGD(TAG, "48.19 VOLTAJE: v1(7-8)=%.1f v2(8-9)=%.1f v3(9-10)=%.1f v4(10-11)=%.1f v5(11-12)=%.1f v6(12-13)=%.1f",
-               v1, v2, v3, v4, v5, v6);
       this->lp_data_.time = millis();
       this->lp_data_.max_voltage_limit = (receive_array[5] << 8) | receive_array[6];
       this->lp_data_.min_voltage_limit = (receive_array[7] << 8) | receive_array[8];
       this->lp_data_.max_current_limit = ((receive_array[9] << 8) | receive_array[10]) * 0.01;
-      UPDATE_NUMBER(max_voltage_limit, this->lp_data_.max_voltage_limit)
-      UPDATE_NUMBER(min_voltage_limit, this->lp_data_.min_voltage_limit)
-      UPDATE_NUMBER(max_current_limit, this->lp_data_.max_current_limit)
+      UPDATE_NUMBER(max_voltage_limit, this->lp_data_.max_voltage_limit);
+      UPDATE_NUMBER(min_voltage_limit, this->lp_data_.min_voltage_limit);
+      UPDATE_NUMBER(max_current_limit, this->lp_data_.max_current_limit);
 
       if (receive_array[1] == 25) {
         this->lp_data_.energy_purchase_state = receive_array[23];
         this->lp_data_.energy_purchase_balance = (((receive_array[15] << 24) | (receive_array[16] << 16) | (receive_array[17] << 8) | receive_array[18]) * 0.01);
         this->ms_data_.warning_purchase_alarm = ((this->lp_data_.energy_purchase_balance <= this->lp_data_.energy_purchase_alarm) && this->lp_data_.energy_purchase_state);
       }
-      UPDATE_SENSOR(energy_purchase_balance, this->lp_data_.energy_purchase_balance)
-      UPDATE_SENSOR(energy_purchase_price, this->lp_data_.energy_purchase_balance * this->ms_data_.price_kWh)
-      UPDATE_SWITCH(energy_purchase_state, this->lp_data_.energy_purchase_state)
-      UPDATE_BINARY_SENSOR(warning_purchase_alarm, this->ms_data_.warning_purchase_alarm)
+      UPDATE_SENSOR(energy_purchase_balance, this->lp_data_.energy_purchase_balance);
+      UPDATE_SENSOR(energy_purchase_price, this->lp_data_.energy_purchase_balance * this->ms_data_.price_kWh);
+      UPDATE_SWITCH(energy_purchase_state, this->lp_data_.energy_purchase_state);
+      UPDATE_BINARY_SENSOR(warning_purchase_alarm, this->ms_data_.warning_purchase_alarm);
       break;
     }
 
@@ -631,7 +618,7 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
       char serial_number[20];
       sprintf(serial_number, "%02u%02u%02u %02u%02u%02u", receive_array[5], receive_array[6], receive_array[7], receive_array[8], receive_array[9], receive_array[10]);
       std::string string_serial_number(serial_number);
-      UPDATE_TEXT_SENSOR(meter_id, string_serial_number)
+      UPDATE_TEXT_SENSOR(meter_id, string_serial_number);
       break;
     }
   }
@@ -651,7 +638,7 @@ bool Dxs238xwComponent::send_command_(SmCommandSend cmd, bool state, bool proces
     case SmCommandSend::GET_MEASUREMENT_DATA: {
       ESP_LOGV(TAG, "In --- send_command - GET_MEASUREMENT_DATA");
       is_good_communication = this->put_command_data_(HEKR_CMD_SEND_GET_MEASUREMENT, HEKR_CMD_RECEIVE_MEASUREMENT);
-        ESP_LOGV(TAG, "Out --- send_command - GET_MEASUREMENT_DATA - Communication Result = %s", TRUEFALSE(is_good_communication));
+      ESP_LOGV(TAG, "Out --- send_command - GET_MEASUREMENT_DATA - Communication Result = %s", TRUEFALSE(is_good_communication));
       break;
     }
     case SmCommandSend::GET_LIMIT_AND_PURCHASE_DATA: {
