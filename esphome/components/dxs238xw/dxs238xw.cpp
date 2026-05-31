@@ -590,6 +590,35 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
     }
 
                         case HEKR_CMD_RECEIVE_MEASUREMENT: {
+                            // === LÍMITES (GET_LIMIT_AND_PURCHASE_DATA - 25 bytes) ===
+    if (receive_array[1] == 25 && receive_array[2] == 0x19) {
+      // Overvoltage limit (bytes 7-8)
+      uint16_t over_volt = (receive_array[7] << 8) | receive_array[8];
+      if (this->max_voltage_limit_number_ != nullptr) {
+        this->max_voltage_limit_number_->publish_state(over_volt * 0.1);
+      }
+
+      // Undervoltage limit (bytes 9-10)
+      uint16_t under_volt = (receive_array[9] << 8) | receive_array[10];
+      if (this->min_voltage_limit_number_ != nullptr) {
+        this->min_voltage_limit_number_->publish_state(under_volt * 0.1);
+      }
+
+      // Overcurrent limit (bytes 11-12)
+      uint16_t over_current = (receive_array[11] << 8) | receive_array[12];
+      if (this->max_current_limit_number_ != nullptr) {
+        this->max_current_limit_number_->publish_state(over_current * 0.01);
+      }
+
+      // Delay time (bytes 13-14)
+      uint16_t delay_time = (receive_array[13] << 8) | receive_array[14];
+      if (this->delay_value_set_number_ != nullptr) {
+        this->delay_value_set_number_->publish_state(delay_time);
+      }
+
+      ESP_LOGD(TAG, "LÍMITES: OverV=%.1fV UnderV=%.1fV OverA=%.2fA Delay=%dmin",
+               over_volt * 0.1, under_volt * 0.1, over_current * 0.01, delay_time);
+    }
       // === FACTOR DE POTENCIA (corregido) ===
       float power_factor = ((receive_array[44] << 8) | receive_array[45]) * 0.001;
       UPDATE_SENSOR(power_factor_phase_1, power_factor);
