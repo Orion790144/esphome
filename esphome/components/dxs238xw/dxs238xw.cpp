@@ -512,11 +512,18 @@ bool Dxs238xwComponent::pre_receive_serial_data_(uint8_t cmd) {
 }
 
 void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
-  // === VOLTAJE SOLO DESDE MENSAJE LEGACY (no se pisa) ===
-  if (receive_array[2] == 0xFE && receive_array[4] == 0x21) {
-    float voltage_legacy = ((receive_array[5] << 8) | receive_array[6]) * 0.00435;
-    UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, voltage_legacy);
-    ESP_LOGD(TAG, "VOLTAJE ACTUALIZADO: %.2f V (legacy)", voltage_legacy);
+    // === BUSCANDO VOLTAJE EN MENSAJE 48.19 ===
+  if (receive_array[2] == 0x19 && receive_array[1] >= 20) {
+    // Probar diferentes pares de bytes
+    float v1 = ((receive_array[7] << 8) | receive_array[8]) * 0.1;
+    float v2 = ((receive_array[8] << 8) | receive_array[9]) * 0.1;
+    float v3 = ((receive_array[9] << 8) | receive_array[10]) * 0.1;
+    float v4 = ((receive_array[10] << 8) | receive_array[11]) * 0.1;
+    float v5 = ((receive_array[11] << 8) | receive_array[12]) * 0.1;
+    float v6 = ((receive_array[12] << 8) | receive_array[13]) * 0.1;
+
+    ESP_LOGD(TAG, "48.19 VOLTAJE: v1(7-8)=%.1f  v2(8-9)=%.1f  v3(9-10)=%.1f  v4(10-11)=%.1f  v5(11-12)=%.1f  v6(12-13)=%.1f",
+             v1, v2, v3, v4, v5, v6);
   }
 
   switch (receive_array[4]) {
