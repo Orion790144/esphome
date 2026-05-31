@@ -637,7 +637,12 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
 
       UPDATE_SENSOR_MEASUREMENTS(total_energy, ((receive_array[8] << 16) | (receive_array[9] << 8) | receive_array[10]) * 0.01);
       UPDATE_SENSOR_MEASUREMENTS(active_power_phase_1, ((receive_array[13] << 8) | receive_array[14]) * 0.0001);
-      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, volt_calc);
+            // VOLTAJE desde mensaje 48.19 (prueba)
+      float volt_4819 = ((receive_array[7] << 8) | receive_array[8]) * 0.1;
+      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, volt_4819);
+      
+      ESP_LOGD(TAG, "VOLTAJE 48.19: bytes[7]=0x%02X bytes[8]=0x%02X → %.2f V", 
+               receive_array[7], receive_array[8], volt_4819);
       UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_1, ((receive_array[13] << 8) | receive_array[14]) * 0.00045);
       UPDATE_SENSOR_MEASUREMENTS(frequency, 50.0);
 
