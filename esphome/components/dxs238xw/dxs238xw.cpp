@@ -630,18 +630,15 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
 
       // Firmware antiguo - mediciones en mensaje de estado
             // Firmware antiguo - mediciones en mensaje de estado
+      // Firmware antiguo - mediciones en mensaje de estado
       UPDATE_SENSOR_MEASUREMENTS(total_energy, ((receive_array[8] << 16) | (receive_array[9] << 8) | receive_array[10]) * 0.01);
       UPDATE_SENSOR_MEASUREMENTS(active_power_phase_1, ((receive_array[13] << 8) | receive_array[14]) * 0.0001);
 
-      // === PRUEBA ACTUAL (ajustando factores) ===
-      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, ((receive_array[9] << 8) | receive_array[10]) * 0.085);   // Voltaje
-      UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_1, ((receive_array[13] << 8) | receive_array[14]) * 0.0045);  // Corriente
-      UPDATE_SENSOR_MEASUREMENTS(frequency, ((receive_array[15] << 8) | receive_array[16]) * 0.01);   // Frecuencia
-      // === NUEVAS LECTURAS (para probar) ===
-      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, ((receive_array[9] << 8) | receive_array[10]) * 0.1);
-      UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_1, ((receive_array[11] << 8) | receive_array[12]) * 0.01);
+      // === FACTORES CORREGIDOS ===
+      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, ((receive_array[9] << 8) | receive_array[10]) * 0.01037);   // Voltaje ≈ 221V
+      UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_1, ((receive_array[13] << 8) | receive_array[14]) * 0.0045); // Corriente
       UPDATE_SENSOR_MEASUREMENTS(frequency, ((receive_array[15] << 8) | receive_array[16]) * 0.01);
-
+      
       if (this->ms_data_.meter_state) {
         this->ms_data_.warning_off_by_over_voltage = false;
         this->ms_data_.warning_off_by_under_voltage = false;
