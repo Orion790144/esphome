@@ -512,12 +512,19 @@ bool Dxs238xwComponent::pre_receive_serial_data_(uint8_t cmd) {
 }
 
 void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
-    // === VOLTAJE DESDE MENSAJE LEGACY (48.16.FE.01.21) ===
+      // === VOLTAJE LEGACY - PRUEBA DE VARIOS BYTES ===
   if (receive_array[2] == 0xFE && receive_array[4] == 0x21) {
-    float voltage_legacy = ((receive_array[5] << 8) | receive_array[6]) * 0.00425;
-    UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, voltage_legacy);
-    ESP_LOGD(TAG, "VOLTAJE LEGACY: bytes[5-6]=0x%02X%02X → %.1f V", 
-             receive_array[5], receive_array[6], voltage_legacy);
+    float v1 = ((receive_array[5] << 8) | receive_array[6]) * 0.00425;
+    float v2 = ((receive_array[6] << 8) | receive_array[7]) * 0.00425;
+    float v3 = ((receive_array[7] << 8) | receive_array[8]) * 0.00425;
+    float v4 = ((receive_array[8] << 8) | receive_array[9]) * 0.00425;
+    float v5 = ((receive_array[5] << 8) | receive_array[6]) * 0.1;
+    float v6 = ((receive_array[6] << 8) | receive_array[7]) * 0.1;
+
+    ESP_LOGD(TAG, "LEGACY VOLTAJE TEST: v1(5-6)=%.1f  v2(6-7)=%.1f  v3(7-8)=%.1f  v4(8-9)=%.1f  v5(5-6*0.1)=%.1f  v6(6-7*0.1)=%.1f",
+             v1, v2, v3, v4, v5, v6);
+
+    UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, v3);
   }
   switch (receive_array[4]) {
     case HEKR_CMD_RECEIVE_METER_STATE: {
