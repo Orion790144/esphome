@@ -8,8 +8,6 @@ namespace dxs238xw {
 static const char *const TAG = "dxs238xw.number";
 
 void Dxs238xwNumber::control(float value) {
-  ESP_LOGI(TAG, "CONTROL CALLED value=%.1f", value);
-
   if (this->state != value) {
     this->parent_->set_number_value(this->entity_id_, value);
   } else {
