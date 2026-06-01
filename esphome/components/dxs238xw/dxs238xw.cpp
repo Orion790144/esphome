@@ -595,20 +595,20 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
       break;
     }
 
-          case HEKR_CMD_RECEIVE_LIMIT_AND_PURCHASE: {
+              case HEKR_CMD_RECEIVE_LIMIT_AND_PURCHASE: {
       if (receive_array[1] == 25) {
 
-        uint16_t max_volt   = (receive_array[5] << 8) | receive_array[6];
-        uint16_t min_volt   = (receive_array[7] << 8) | receive_array[8];
-        uint16_t max_current= (receive_array[9] << 8) | receive_array[10];
-        uint16_t delay_time = (receive_array[13] << 8) | receive_array[14];
+        uint16_t max_volt    = (receive_array[5] << 8) | receive_array[6];
+        uint16_t min_volt    = (receive_array[7] << 8) | receive_array[8];
+        uint16_t max_current = (receive_array[9] << 8) | receive_array[10];
+        uint16_t delay_time  = (receive_array[13] << 8) | receive_array[14];
 
-        UPDATE_NUMBER(max_voltage_limit, max_volt * 1.0);     // 245 V
-        UPDATE_NUMBER(min_voltage_limit, min_volt * 1.0);     // 190 V
-        UPDATE_NUMBER(max_current_limit, max_current * 0.01); // 30 A
+        UPDATE_NUMBER(max_voltage_limit, max_volt * 1.0);
+        UPDATE_NUMBER(min_voltage_limit, min_volt * 1.0);
+        UPDATE_NUMBER(max_current_limit, max_current * 0.01);
         UPDATE_NUMBER(delay_value_set, delay_time);
 
-        ESP_LOGI(TAG, "✅ LÍMITES CORRECTOS → MáxV=%.0fV  MínV=%.0fV  MáxA=%.1fA  Delay=%d min",
+        ESP_LOGI(TAG, "✅ LÍMITES LEÍDOS → MáxV=%.0fV  MínV=%.0fV  MáxA=%.1fA  Delay=%d min",
                  max_volt * 1.0, min_volt * 1.0, max_current * 0.01, delay_time);
       }
       break;
