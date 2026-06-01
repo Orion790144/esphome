@@ -595,27 +595,21 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
       break;
     }
 
-        case HEKR_CMD_RECEIVE_LIMIT_AND_PURCHASE: {
+          case HEKR_CMD_RECEIVE_LIMIT_AND_PURCHASE: {
       if (receive_array[1] == 25) {
 
-        // Probamos diferentes combinaciones de bytes
-        uint16_t val1 = (receive_array[7]  << 8) | receive_array[8];
-        uint16_t val2 = (receive_array[9]  << 8) | receive_array[10];
-        uint16_t val3 = (receive_array[11] << 8) | receive_array[12];
-        uint16_t val4 = (receive_array[5]  << 8) | receive_array[6];   // prueba extra
-        uint16_t val5 = (receive_array[19] << 8) | receive_array[20];  // prueba extra
+        uint16_t max_volt   = (receive_array[5] << 8) | receive_array[6];
+        uint16_t min_volt   = (receive_array[7] << 8) | receive_array[8];
+        uint16_t max_current= (receive_array[9] << 8) | receive_array[10];
+        uint16_t delay_time = (receive_array[13] << 8) | receive_array[14];
 
-        ESP_LOGI(TAG, "RAW BYTES TEST → [7-8]=%d [9-10]=%d [11-12]=%d [5-6]=%d [19-20]=%d", 
-                 val1, val2, val3, val4, val5);
+        UPDATE_NUMBER(max_voltage_limit, max_volt * 1.0);     // 245 V
+        UPDATE_NUMBER(min_voltage_limit, min_volt * 1.0);     // 190 V
+        UPDATE_NUMBER(max_current_limit, max_current * 0.01); // 30 A
+        UPDATE_NUMBER(delay_value_set, delay_time);
 
-        // Asignamos según lo que nos digas
-        UPDATE_NUMBER(max_voltage_limit, val2 * 0.1);   // prueba
-        UPDATE_NUMBER(min_voltage_limit, val1 * 0.1);   // prueba
-        UPDATE_NUMBER(max_current_limit, val3 * 0.01);  // prueba
-        UPDATE_NUMBER(delay_value_set, val4);
-
-        ESP_LOGI(TAG, "LÍMITES ACTUALES → MáxV=%.1fV  MínV=%.1fV  MáxA=%.2fA", 
-                 val2 * 0.1, val1 * 0.1, val3 * 0.01);
+        ESP_LOGI(TAG, "✅ LÍMITES CORRECTOS → MáxV=%.0fV  MínV=%.0fV  MáxA=%.1fA  Delay=%d min",
+                 max_volt * 1.0, min_volt * 1.0, max_current * 0.01, delay_time);
       }
       break;
     }
