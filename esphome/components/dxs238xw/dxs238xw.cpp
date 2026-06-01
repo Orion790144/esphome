@@ -520,97 +520,20 @@ bool Dxs238xwComponent::pre_receive_serial_data_(uint8_t cmd) {
 }
 
 void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
+      // === VOLTAJE LEGACY - PRUEBA DE VARIOS BYTES ===
   if (receive_array[2] == 0xFE && receive_array[4] == 0x21) {
+    float v1 = ((receive_array[5] << 8) | receive_array[6]) * 0.00425;
+    float v2 = ((receive_array[6] << 8) | receive_array[7]) * 0.00425;
     float v3 = ((receive_array[7] << 8) | receive_array[8]) * 0.00425;
+    float v4 = ((receive_array[8] << 8) | receive_array[9]) * 0.00425;
+    float v5 = ((receive_array[5] << 8) | receive_array[6]) * 0.1;
+    float v6 = ((receive_array[6] << 8) | receive_array[7]) * 0.1;
+
+    ESP_LOGD(TAG, "LEGACY VOLTAJE TEST: v1(5-6)=%.1f  v2(6-7)=%.1f  v3(7-8)=%.1f  v4(8-9)=%.1f  v5(5-6*0.1)=%.1f  v6(6-7*0.1)=%.1f",
+             v1, v2, v3, v4, v5, v6);
+
     UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, v3);
   }
-
-  switch (receive_array[4]) {
-    case HEKR_CMD_RECEIVE_METER_STATE: {
-      this->ms_data_.time = millis();
-      this->ms_data_.phase_count = receive_array[5];
-      this->ms_data_.meter_state = receive_array[6];
-      this->ms_data_.delay_state = receive_array[18];
-      this->ms_data_.delay_value_remaining = (receive_array[16] << 8) | receive_array[17];
-      UPDATE_SENSOR_MEASUREMENTS(total_energy, ((receive_array[8] << 16) | (receive_array[9] << 8) | receive_array[10]) * 0.01);
-      UPDATE_SENSOR_MEASUREMENTS(active_power_phase_1, ((receive_array[13] << 8) | receive_array[14]) * 0.0001);
-      UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_1, ((receive_array[13] << 8) | receive_array[14]) * 0.00045);
-      UPDATE_SENSOR_MEASUREMENTS(frequency, 50.0);
-      if (this->ms_data_.meter_state) {
-        this->ms_data_.warning_off_by_over_voltage = false;
-        this->ms_data_.warning_off_by_under_voltage = false;
-        this->ms_data_.warning_off_by_over_current = false;
-        this->ms_data_.warning_off_by_end_purchase = false;
-        this->ms_data_.warning_off_by_end_delay = false;
-        this->ms_data_.warning_off_by_user = false;
-      }
-      if (!this->ms_data_.warning_off_by_over_voltage) {
-        this->ms_data_.warning_off_by_over_voltage = (receive_array[11] == 1);
-      }
-      if (!this->ms_data_.warning_off_by_under_voltage) {
-        this->ms_data_.warning_off_by_under_voltage = (receive_array[11] == 2);
-      }
-      if (!this->ms_data_.warning_off_by_over_current) {
-        this->ms_data_.warning_off_by_over_current = receive_array[15];
-      }
-      if (!this->ms_data_.warning_off_by_end_purchase) {
-        this->ms_data_.warning_off_by_end_purchase = (receive_array[1] == 21 ? receive_array[19] : false);
-      }
-      if (!this->ms_data_.warning_off_by_end_delay && this->get_component_state() == COMPONENT_STATE_LOOP) {
-        this->ms_data_.warning_off_by_end_delay = (this->ms_data_.delay_value_remaining == 0 && this->ms_data_.delay_state);
-      }
-      UPDATE_TEXT_SENSOR(delay_value_remaining, this->get_delay_value_remaining_string_(this->ms_data_.delay_value_remaining))
-      UPDATE_BINARY_SENSOR(warning_off_by_over_voltage, this->ms_data_.warning_off_by_over_voltage)
-      UPDATE_BINARY_SENSOR(warning_off_by_under_voltage, this->ms_data_.warning_off_by_under_voltage)
-      UPDATE_BINARY_SENSOR(warning_off_by_over_current, this->ms_data_.warning_off_by_over_current)
-      UPDATE_BINARY_SENSOR(warning_off_by_end_purchase, this->ms_data_.warning_off_by_end_purchase)
-      UPDATE_BINARY_SENSOR(warning_off_by_end_delay, this->ms_data_.warning_off_by_end_delay)
-      UPDATE_BINARY_SENSOR(warning_off_by_user, this->ms_data_.warning_off_by_user)
-      UPDATE_BINARY_SENSOR(meter_state, this->ms_data_.meter_state)
-      UPDATE_SWITCH(meter_state, this->ms_data_.meter_state)
-      UPDATE_SWITCH(delay_state, this->ms_data_.delay_state)
-      this->update_meter_state_detail_();
-      break;
-    }
-
-    case HEKR_CMD_RECEIVE_MEASUREMENT: {
-      float power_factor = ((receive_array[44] << 8) | receive_array[45]) * 0.001;
-      UPDATE_SENSOR(power_factor_phase_1, power_factor);
-
-      float reactive_power = ((receive_array[20] << 16) | (receive_array[21] << 8) | receive_array[22]) * 0.0001;
-      UPDATE_SENSOR(reactive_power_phase_1, reactive_power);
-
-      float voltage = ((receive_array[14] << 8) | receive_array[15]) * 0.1;
-      UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, voltage);
-
-      UPDATE_SENSOR_MEASUREMENTS_CURRENT(current_phase_1, ((receive_array[5] << 16) | (receive_array[6] << 8) | receive_array[7]) * 0.001);
-      UPDATE_SENSOR_MEASUREMENTS_POWER(active_power_phase_1, ((receive_array[32] << 16) | (receive_array[33] << 8) | receive_array[34]) * 0.0001);
-      UPDATE_SENSOR_MEASUREMENTS(frequency, ((receive_array[52] << 8) | receive_array[53]) * 0.01);
-      UPDATE_SENSOR_MEASUREMENTS(total_energy, ((receive_array[54] << 24) | (receive_array[55] << 16) | (receive_array[56] << 8) | receive_array[57]) * 0.01);
-      break;
-    }
-
-    case HEKR_CMD_RECEIVE_LIMIT_AND_PURCHASE: {
-      if (receive_array[1] == 25) {
-        uint16_t over_volt = (receive_array[7] << 8) | receive_array[8];
-        UPDATE_NUMBER(max_voltage_limit, over_volt * 0.1);
-
-        uint16_t under_volt = (receive_array[9] << 8) | receive_array[10];
-        UPDATE_NUMBER(min_voltage_limit, under_volt * 0.1);
-
-        uint16_t over_current = (receive_array[11] << 8) | receive_array[12];
-        UPDATE_NUMBER(max_current_limit, over_current * 0.01);
-
-        uint16_t delay_time = (receive_array[13] << 8) | receive_array[14];
-        UPDATE_NUMBER(delay_value_set, delay_time);
-
-        ESP_LOGD(TAG, "LÍMITES: OverV=%.1f UnderV=%.1f OverA=%.2f Delay=%d",
-                 over_volt * 0.1, under_volt * 0.1, over_current * 0.01, delay_time);
-      }
-      break;
-    }
-  }
-}
   switch (receive_array[4]) {
     case HEKR_CMD_RECEIVE_METER_STATE: {
       this->ms_data_.time = millis();
