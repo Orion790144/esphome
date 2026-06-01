@@ -697,7 +697,7 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
       UPDATE_NUMBER(min_voltage_limit, this->lp_data_.min_voltage_limit)
       UPDATE_NUMBER(max_current_limit, this->lp_data_.max_current_limit)
 
-      ESP_LOGD(TAG, "LIMITES: MaxV=%u MinV=%u MaxA=%.2f", this->lp_data_.max_voltage_limit, this->lp_data_.min_voltage_limit, this->lp_data_.max_current_limit)
+      ESP_LOGD(TAG, "LIMITES: MaxV=%u MinV=%u MaxA=%.2f", this->lp_data_.max_voltage_limit, this->lp_data_.min_voltage_limit, this->lp_data_.max_current_limit);
 
       if (receive_array[1] == 25) {
         this->lp_data_.energy_purchase_state = receive_array[23];
