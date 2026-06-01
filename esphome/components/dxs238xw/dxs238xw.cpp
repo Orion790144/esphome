@@ -608,6 +608,10 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
         uint16_t max_current = (receive_array[9] << 8) | receive_array[10];
         uint16_t delay_time  = (receive_array[13] << 8) | receive_array[14];
 
+        this->lp_data_.max_voltage_limit = max_volt;
+        this->lp_data_.min_voltage_limit = min_volt;
+        this->lp_data_.max_current_limit = max_current * 0.01;
+      
         UPDATE_NUMBER(max_voltage_limit, max_volt * 1.0);
         UPDATE_NUMBER(min_voltage_limit, min_volt * 1.0);
         UPDATE_NUMBER(max_current_limit, max_current * 0.01);
