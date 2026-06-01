@@ -301,6 +301,7 @@ void Dxs238xwComponent::set_button_value(SmIdEntity entity) {
 void Dxs238xwComponent::set_number_value(SmIdEntity entity, float value) {
   if (this->get_component_state() == COMPONENT_STATE_LOOP) {
     uint32_t tmp_value = std::round(value);
+    ESP_LOGI(TAG, "SET_NUMBER_VALUE entity=%d value=%.1f", (int) entity, value);
     switch (entity) {
       case SmIdEntity::NUMBER_MAX_CURRENT_LIMIT: {
         this->lp_data_.max_current_limit = tmp_value;
@@ -311,6 +312,7 @@ void Dxs238xwComponent::set_number_value(SmIdEntity entity, float value) {
       case SmIdEntity::NUMBER_MAX_VOLTAGE_LIMIT: {
         if (tmp_value > this->lp_data_.min_voltage_limit) {
           this->lp_data_.max_voltage_limit = tmp_value;
+          ESP_LOGI(TAG, "Sending SET_LIMIT_DATA for current limit");
           this->send_command_(SmCommandSend::SET_LIMIT_DATA);
         } else {
           ESP_LOGW(TAG, "max_voltage_limit - Value %u must not be less than min_voltage_limit %u", tmp_value, this->lp_data_.min_voltage_limit);
