@@ -145,10 +145,17 @@ void Dxs238xwComponent::loop() {
   this->incoming_messages_();
 
   static uint32_t last_update = 0;
+  static bool limits_loaded = false;
+
   if (millis() - last_update > 5000) {
     this->send_command_(SmCommandSend::GET_POWER_STATE);
     this->send_command_(SmCommandSend::GET_MEASUREMENT_DATA);
     last_update = millis();
+  }
+
+  if (!limits_loaded && millis() > 60000) {
+    this->send_command_(SmCommandSend::GET_LIMIT_AND_PURCHASE_DATA);
+    limits_loaded = true;
   }
 }
 
