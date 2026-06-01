@@ -635,6 +635,21 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
       UPDATE_SENSOR_MEASUREMENTS(frequency, ((receive_array[52] << 8) | receive_array[53]) * 0.01);
       UPDATE_SENSOR_MEASUREMENTS(total_energy, ((receive_array[54] << 24) | (receive_array[55] << 16) | (receive_array[56] << 8) | receive_array[57]) * 0.01);
 
+                          case HEKR_CMD_RECEIVE_LIMIT_AND_PURCHASE: {
+      if (receive_array[1] == 25) {   // mensaje de 25 bytes
+
+        uint16_t over_volt   = (receive_array[7] << 8) | receive_array[8];
+        uint16_t under_volt  = (receive_array[9] << 8) | receive_array[10];
+        uint16_t over_current= (receive_array[11] << 8) | receive_array[12];
+        uint16_t delay_time  = (receive_array[13] << 8) | receive_array[14];
+
+        UPDATE_NUMBER(max_voltage_limit, over_volt * 0.1);
+        UPDATE_NUMBER(min_voltage_limit, under_volt * 0.1);
+        UPDATE_NUMBER(max_current_limit, over_current * 0.01);
+        UPDATE_NUMBER(delay_value_set,   delay_time);
+
+        ESP_LOGI(TAG, "✅ LÍMITES RECIBIDOS → OverV=%.1fV  UnderV=%.1fV  OverA=%.2fA  Delay=%d min",
+                 over_volt * 0.1, under_volt * 0.1, over_current * 0.01, delay_time);
       break;
     }
   }
