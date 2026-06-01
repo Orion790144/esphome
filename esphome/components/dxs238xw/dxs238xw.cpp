@@ -136,21 +136,13 @@ void Dxs238xwComponent::setup() {
 
 void Dxs238xwComponent::update() {
   if (this->get_component_state() == COMPONENT_STATE_LOOP) {
+    this->send_command_(SmCommandSend::GET_POWER_STATE);
     this->send_command_(SmCommandSend::GET_MEASUREMENT_DATA);
   }
 }
 
 void Dxs238xwComponent::loop() {
   this->incoming_messages_();
-
-  // Actualización cada 5 segundos (recomendado)
-  static uint32_t last_update = 0;
-  if (millis() - last_update > 5000) {
-    this->send_command_(SmCommandSend::GET_POWER_STATE);
-    this->send_command_(SmCommandSend::GET_LIMIT_AND_PURCHASE_DATA);
-    this->send_command_(SmCommandSend::GET_MEASUREMENT_DATA);
-    last_update = millis();
-  }
 }
 
 void Dxs238xwComponent::dump_config() {
