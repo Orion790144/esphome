@@ -305,7 +305,12 @@ void Dxs238xwComponent::set_button_value(SmIdEntity entity) {
 }
 
 void Dxs238xwComponent::set_number_value(SmIdEntity entity, float value) {
-   case SmIdEntity::NUMBER_MAX_CURRENT_LIMIT: {
+  if (this->get_component_state() == COMPONENT_STATE_LOOP) {
+    uint32_t tmp_value = std::round(value);
+
+    switch (entity) {
+
+      case SmIdEntity::NUMBER_MAX_CURRENT_LIMIT: {
   this->lp_data_.max_current_limit = tmp_value;
 
   if (this->send_command_(SmCommandSend::SET_LIMIT_DATA)) {
@@ -386,11 +391,12 @@ void Dxs238xwComponent::set_number_value(SmIdEntity entity, float value) {
         UPDATE_SENSOR(price_kWh, this->ms_data_.price_kWh)
         break;
       }
-      default: {
+            default: {
         ESP_LOGE(TAG, "ID %hhu is not a NUMBER or is not included in the case list", entity);
         return;
       }
     }
+  }
 }
 
 //------------------------------------------------------------------------------
