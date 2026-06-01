@@ -143,6 +143,13 @@ void Dxs238xwComponent::update() {
 
 void Dxs238xwComponent::loop() {
   this->incoming_messages_();
+
+  static uint32_t last_update = 0;
+  if (millis() - last_update > 5000) {
+    this->send_command_(SmCommandSend::GET_POWER_STATE);
+    this->send_command_(SmCommandSend::GET_MEASUREMENT_DATA);
+    last_update = millis();
+  }
 }
 
 void Dxs238xwComponent::dump_config() {
