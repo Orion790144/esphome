@@ -142,15 +142,14 @@ void Dxs238xwComponent::update() {
 
 void Dxs238xwComponent::loop() {
   this->incoming_messages_();
-  this->send_command_(SmCommandSend::GET_POWER_STATE);
-  this->send_command_(SmCommandSend::GET_LIMIT_AND_PURCHASE_DATA);
 
-  // === FORZAR MEDICIONES DETALLADAS ===
-  static uint32_t last_measurement = 0;
-  if (millis() - last_measurement > 1500) {
-    ESP_LOGW(TAG, ">>> ENVIANDO GET_MEASUREMENT_DATA (forzado)");
+  // Actualización cada 4 segundos (mucho más eficiente)
+  static uint32_t last_update = 0;
+  if (millis() - last_update > 4000) {
+    this->send_command_(SmCommandSend::GET_POWER_STATE);
+    this->send_command_(SmCommandSend::GET_LIMIT_AND_PURCHASE_DATA);
     this->send_command_(SmCommandSend::GET_MEASUREMENT_DATA);
-    last_measurement = millis();
+    last_update = millis();
   }
 }
 
