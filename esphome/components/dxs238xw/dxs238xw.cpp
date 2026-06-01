@@ -299,6 +299,8 @@ void Dxs238xwComponent::set_button_value(SmIdEntity entity) {
 }
 
 void Dxs238xwComponent::set_number_value(SmIdEntity entity, float value) {
+  ESP_LOGI(TAG, "set_number_value() called");
+  ESP_LOGI(TAG, "component state = %d", this->get_component_state());
   if (this->get_component_state() == COMPONENT_STATE_LOOP) {
     uint32_t tmp_value = std::round(value);
     ESP_LOGI(TAG, "SET_NUMBER_VALUE entity=%d value=%.1f", (int) entity, value);
