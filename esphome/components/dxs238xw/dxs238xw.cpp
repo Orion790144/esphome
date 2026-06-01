@@ -595,20 +595,27 @@ void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
       break;
     }
 
-    case HEKR_CMD_RECEIVE_LIMIT_AND_PURCHASE: {
+        case HEKR_CMD_RECEIVE_LIMIT_AND_PURCHASE: {
       if (receive_array[1] == 25) {
-        uint16_t over_volt    = (receive_array[7] << 8) | receive_array[8];
-        uint16_t under_volt   = (receive_array[9] << 8) | receive_array[10];
-        uint16_t over_current = (receive_array[11] << 8) | receive_array[12];
-        uint16_t delay_time   = (receive_array[13] << 8) | receive_array[14];
 
-        UPDATE_NUMBER(max_voltage_limit, over_volt * 0.1);
-        UPDATE_NUMBER(min_voltage_limit, under_volt * 0.1);
-        UPDATE_NUMBER(max_current_limit, over_current * 0.01);
-        UPDATE_NUMBER(delay_value_set, delay_time);
+        // Probamos diferentes combinaciones de bytes
+        uint16_t val1 = (receive_array[7]  << 8) | receive_array[8];
+        uint16_t val2 = (receive_array[9]  << 8) | receive_array[10];
+        uint16_t val3 = (receive_array[11] << 8) | receive_array[12];
+        uint16_t val4 = (receive_array[5]  << 8) | receive_array[6];   // prueba extra
+        uint16_t val5 = (receive_array[19] << 8) | receive_array[20];  // prueba extra
 
-        ESP_LOGI(TAG, "LÍMITES: OverV=%.1fV UnderV=%.1fV OverA=%.2fA Delay=%dmin",
-                 over_volt * 0.1, under_volt * 0.1, over_current * 0.01, delay_time);
+        ESP_LOGI(TAG, "RAW BYTES TEST → [7-8]=%d [9-10]=%d [11-12]=%d [5-6]=%d [19-20]=%d", 
+                 val1, val2, val3, val4, val5);
+
+        // Asignamos según lo que nos digas
+        UPDATE_NUMBER(max_voltage_limit, val2 * 0.1);   // prueba
+        UPDATE_NUMBER(min_voltage_limit, val1 * 0.1);   // prueba
+        UPDATE_NUMBER(max_current_limit, val3 * 0.01);  // prueba
+        UPDATE_NUMBER(delay_value_set, val4);
+
+        ESP_LOGI(TAG, "LÍMITES ACTUALES → MáxV=%.1fV  MínV=%.1fV  MáxA=%.2fA", 
+                 val2 * 0.1, val1 * 0.1, val3 * 0.01);
       }
       break;
     }
