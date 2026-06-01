@@ -136,7 +136,6 @@ void Dxs238xwComponent::setup() {
 
 void Dxs238xwComponent::update() {
   if (this->get_component_state() == COMPONENT_STATE_LOOP) {
-    this->send_command_(SmCommandSend::GET_POWER_STATE);
     this->send_command_(SmCommandSend::GET_MEASUREMENT_DATA);
   }
 }
@@ -144,18 +143,13 @@ void Dxs238xwComponent::update() {
 void Dxs238xwComponent::loop() {
   this->incoming_messages_();
 
+  // Actualización cada 5 segundos (recomendado)
   static uint32_t last_update = 0;
-  static bool limits_loaded = false;
-
   if (millis() - last_update > 5000) {
     this->send_command_(SmCommandSend::GET_POWER_STATE);
+    this->send_command_(SmCommandSend::GET_LIMIT_AND_PURCHASE_DATA);
     this->send_command_(SmCommandSend::GET_MEASUREMENT_DATA);
     last_update = millis();
-  }
-
-  if (!limits_loaded && millis() > 60000) {
-    this->send_command_(SmCommandSend::GET_LIMIT_AND_PURCHASE_DATA);
-    limits_loaded = true;
   }
 }
 
@@ -305,46 +299,34 @@ void Dxs238xwComponent::set_button_value(SmIdEntity entity) {
 }
 
 void Dxs238xwComponent::set_number_value(SmIdEntity entity, float value) {
-  if (this->get_component_state() == COMPONENT_STATE_LOOP) {
     uint32_t tmp_value = std::round(value);
-
     switch (entity) {
-
       case SmIdEntity::NUMBER_MAX_CURRENT_LIMIT: {
-  this->lp_data_.max_current_limit = tmp_value;
-
-  if (this->send_command_(SmCommandSend::SET_LIMIT_DATA)) {
-    this->send_command_(SmCommandSend::GET_LIMIT_AND_PURCHASE_DATA);
-  }
-
-  break;
-}
+        this->lp_data_.max_current_limit = tmp_value;
+        this->send_command_(SmCommandSend::SET_LIMIT_DATA);
+        UPDATE_NUMBER(max_current_limit, this->lp_data_.max_current_limit)
+        break;
+      }
       case SmIdEntity::NUMBER_MAX_VOLTAGE_LIMIT: {
-  if (tmp_value > this->lp_data_.min_voltage_limit) {
-    this->lp_data_.max_voltage_limit = tmp_value;
-
-    if (this->send_command_(SmCommandSend::SET_LIMIT_DATA)) {
-      this->send_command_(SmCommandSend::GET_LIMIT_AND_PURCHASE_DATA);
-    }
-  } else {
-    ESP_LOGW(TAG, "max_voltage_limit - Value %u must not be less than min_voltage_limit %u",
-             tmp_value, this->lp_data_.min_voltage_limit);
-  }
-  break;
-}
+        if (tmp_value > this->lp_data_.min_voltage_limit) {
+          this->lp_data_.max_voltage_limit = tmp_value;
+          this->send_command_(SmCommandSend::SET_LIMIT_DATA);
+        } else {
+          ESP_LOGW(TAG, "max_voltage_limit - Value %u must not be less than min_voltage_limit %u", tmp_value, this->lp_data_.min_voltage_limit);
+        }
+        UPDATE_NUMBER(max_voltage_limit, this->lp_data_.max_voltage_limit)
+        break;
+      }
       case SmIdEntity::NUMBER_MIN_VOLTAGE_LIMIT: {
-  if (tmp_value < this->lp_data_.max_voltage_limit) {
-    this->lp_data_.min_voltage_limit = tmp_value;
-
-    if (this->send_command_(SmCommandSend::SET_LIMIT_DATA)) {
-      this->send_command_(SmCommandSend::GET_LIMIT_AND_PURCHASE_DATA);
-    }
-  } else {
-    ESP_LOGW(TAG, "min_voltage_limit - Value %u must not be greater than max_voltage_limit %u",
-             tmp_value, this->lp_data_.max_voltage_limit);
-  }
-  break;
-}
+        if (tmp_value < this->lp_data_.max_voltage_limit) {
+          this->lp_data_.min_voltage_limit = tmp_value;
+          this->send_command_(SmCommandSend::SET_LIMIT_DATA);
+        } else {
+          ESP_LOGW(TAG, "min_voltage_limit - Value %u must not be greater than max_voltage_limit %u", tmp_value, this->lp_data_.max_voltage_limit);
+        }
+        UPDATE_NUMBER(min_voltage_limit, this->lp_data_.min_voltage_limit)
+        break;
+      }
       case SmIdEntity::NUMBER_ENERGY_PURCHASE_VALUE: {
         this->lp_data_.energy_purchase_value = tmp_value;
         this->save_initial_number_value_(this->preference_energy_purchase_value_, this->lp_data_.energy_purchase_value);
@@ -391,12 +373,11 @@ void Dxs238xwComponent::set_number_value(SmIdEntity entity, float value) {
         UPDATE_SENSOR(price_kWh, this->ms_data_.price_kWh)
         break;
       }
-            default: {
+      default: {
         ESP_LOGE(TAG, "ID %hhu is not a NUMBER or is not included in the case list", entity);
         return;
       }
     }
-  }
 }
 
 //------------------------------------------------------------------------------
