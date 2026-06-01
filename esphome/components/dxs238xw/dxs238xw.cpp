@@ -305,34 +305,41 @@ void Dxs238xwComponent::set_button_value(SmIdEntity entity) {
 }
 
 void Dxs238xwComponent::set_number_value(SmIdEntity entity, float value) {
-    uint32_t tmp_value = std::round(value);
-    switch (entity) {
-      case SmIdEntity::NUMBER_MAX_CURRENT_LIMIT: {
-        this->lp_data_.max_current_limit = tmp_value;
-        this->send_command_(SmCommandSend::SET_LIMIT_DATA);
-        UPDATE_NUMBER(max_current_limit, this->lp_data_.max_current_limit)
-        break;
-      }
+   case SmIdEntity::NUMBER_MAX_CURRENT_LIMIT: {
+  this->lp_data_.max_current_limit = tmp_value;
+
+  if (this->send_command_(SmCommandSend::SET_LIMIT_DATA)) {
+    this->send_command_(SmCommandSend::GET_LIMIT_AND_PURCHASE_DATA);
+  }
+
+  break;
+}
       case SmIdEntity::NUMBER_MAX_VOLTAGE_LIMIT: {
-        if (tmp_value > this->lp_data_.min_voltage_limit) {
-          this->lp_data_.max_voltage_limit = tmp_value;
-          this->send_command_(SmCommandSend::SET_LIMIT_DATA);
-        } else {
-          ESP_LOGW(TAG, "max_voltage_limit - Value %u must not be less than min_voltage_limit %u", tmp_value, this->lp_data_.min_voltage_limit);
-        }
-        UPDATE_NUMBER(max_voltage_limit, this->lp_data_.max_voltage_limit)
-        break;
-      }
+  if (tmp_value > this->lp_data_.min_voltage_limit) {
+    this->lp_data_.max_voltage_limit = tmp_value;
+
+    if (this->send_command_(SmCommandSend::SET_LIMIT_DATA)) {
+      this->send_command_(SmCommandSend::GET_LIMIT_AND_PURCHASE_DATA);
+    }
+  } else {
+    ESP_LOGW(TAG, "max_voltage_limit - Value %u must not be less than min_voltage_limit %u",
+             tmp_value, this->lp_data_.min_voltage_limit);
+  }
+  break;
+}
       case SmIdEntity::NUMBER_MIN_VOLTAGE_LIMIT: {
-        if (tmp_value < this->lp_data_.max_voltage_limit) {
-          this->lp_data_.min_voltage_limit = tmp_value;
-          this->send_command_(SmCommandSend::SET_LIMIT_DATA);
-        } else {
-          ESP_LOGW(TAG, "min_voltage_limit - Value %u must not be greater than max_voltage_limit %u", tmp_value, this->lp_data_.max_voltage_limit);
-        }
-        UPDATE_NUMBER(min_voltage_limit, this->lp_data_.min_voltage_limit)
-        break;
-      }
+  if (tmp_value < this->lp_data_.max_voltage_limit) {
+    this->lp_data_.min_voltage_limit = tmp_value;
+
+    if (this->send_command_(SmCommandSend::SET_LIMIT_DATA)) {
+      this->send_command_(SmCommandSend::GET_LIMIT_AND_PURCHASE_DATA);
+    }
+  } else {
+    ESP_LOGW(TAG, "min_voltage_limit - Value %u must not be greater than max_voltage_limit %u",
+             tmp_value, this->lp_data_.max_voltage_limit);
+  }
+  break;
+}
       case SmIdEntity::NUMBER_ENERGY_PURCHASE_VALUE: {
         this->lp_data_.energy_purchase_value = tmp_value;
         this->save_initial_number_value_(this->preference_energy_purchase_value_, this->lp_data_.energy_purchase_value);
