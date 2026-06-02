@@ -528,9 +528,7 @@ bool Dxs238xwComponent::pre_receive_serial_data_(uint8_t cmd) {
   return false;
 }
 
-void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
-
-  }
+void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array)
 
   switch (receive_array[4]) {
 
