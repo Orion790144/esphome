@@ -134,22 +134,31 @@ void Dxs238xwComponent::setup() {
   }
 }
 
-void Dxs238xwComponent::update() {
-  if (this->get_component_state() == COMPONENT_STATE_LOOP) {
-    this->send_command_(SmCommandSend::GET_MEASUREMENT_DATA);
-  }
-}
-
 void Dxs238xwComponent::loop() {
   this->incoming_messages_();
 
-  // Actualización cada 5 segundos (recomendado)
-  static uint32_t last_update = 0;
-  if (millis() - last_update > 5000) {
+  static uint32_t boot_time = millis();
+  static uint32_t last_measurement = 0;
+  static uint32_t last_limits = 0;
+  static bool first_limits_read = false;
+
+  if (millis() - last_measurement > 5000) {
     this->send_command_(SmCommandSend::GET_POWER_STATE);
-    this->send_command_(SmCommandSend::GET_LIMIT_AND_PURCHASE_DATA);
     this->send_command_(SmCommandSend::GET_MEASUREMENT_DATA);
-    last_update = millis();
+    last_measurement = millis();
+  }
+
+  if (!first_limits_read) {
+    if (millis() - boot_time > 120000) {
+      this->send_command_(SmCommandSend::GET_LIMIT_AND_PURCHASE_DATA);
+      first_limits_read = true;
+      last_limits = millis();
+    }
+  } else {
+    if (millis() - last_limits > 3600000) {
+      this->send_command_(SmCommandSend::GET_LIMIT_AND_PURCHASE_DATA);
+      last_limits = millis();
+    }
   }
 }
 
