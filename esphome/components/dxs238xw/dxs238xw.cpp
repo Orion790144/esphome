@@ -143,7 +143,7 @@ void Dxs238xwComponent::loop() {
   static bool first_limits_read = false;
 
   if (millis() - last_measurement > 5000) {
-    this->send_command_(SmCommandSend::GET_POWER_STATE);
+    //this->send_command_(SmCommandSend::GET_POWER_STATE);
     this->send_command_(SmCommandSend::GET_MEASUREMENT_DATA);
     last_measurement = millis();
   }
