@@ -25,7 +25,7 @@ static const uint16_t SM_POSTPONE_SETUP_TIME = 10000;
 static const uint16_t SM_POSTPONE_SETUP_TIME = 2500;
 #endif
 
-static const uint16_t SM_MAX_MILLIS_TO_CONFIRM = 200;
+static const uint16_t SM_MAX_MILLIS_TO_CONFIRM = 500;
 static const uint16_t SM_MAX_MILLIS_TO_RESPONSE = 1000;
 
 //------------------------------------------------------------------------------
