@@ -530,9 +530,6 @@ bool Dxs238xwComponent::pre_receive_serial_data_(uint8_t cmd) {
 
 void Dxs238xwComponent::process_and_update_data_(const uint8_t *receive_array) {
 
-  if (receive_array[2] == 0xFE && receive_array[4] == 0x21) {
-    float v3 = ((receive_array[7] << 8) | receive_array[8]) * 0.00425;
-    UPDATE_SENSOR_MEASUREMENTS(voltage_phase_1, v3);
   }
 
   switch (receive_array[4]) {
